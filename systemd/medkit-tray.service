@@ -1,0 +1,12 @@
+[Unit]
+Description=MedKit — Wayland system tray application
+Documentation=file:%h/medkit/README.md
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/medkit/bin/medkit --gui
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

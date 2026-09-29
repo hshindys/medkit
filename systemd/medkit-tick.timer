@@ -1,0 +1,11 @@
+[Unit]
+Description=MedKit — wake every minute to evaluate the schedule
+
+[Timer]
+OnBootSec=20s
+OnUnitActiveSec=60s
+AccuracySec=5s
+Unit=medkit-tick.service
+
+[Install]
+WantedBy=timers.target

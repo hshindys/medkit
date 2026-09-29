@@ -1,0 +1,8 @@
+[Unit]
+Description=MedKit — evaluate the medication schedule and notify
+Documentation=file:%h/medkit/README.md
+
+[Service]
+Type=oneshot
+ExecStart=%h/medkit/bin/medkit --tick
+Nice=5

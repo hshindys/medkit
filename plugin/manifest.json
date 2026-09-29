@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "hshindys.medkit",
+  "name": "MedKit",
+  "version": "1.0.0",
+  "author": "hshindys",
+  "description": "Medication status in the bar: next dose time, daily progress and low-stock warnings. Click to open or close the MedKit dashboard.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "MedKitBar.qml"
+  },
+  "barWidget": {
+    "displayName": "MedKit",
+    "description": "Next dose time and stock warnings; click toggles the dashboard",
+    "category": "Status",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Print the StatusNotifierWatcher registry and the MedKit item properties.
+set -euo pipefail
+items=$(busctl --user get-property org.kde.StatusNotifierWatcher /StatusNotifierWatcher \
+  org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems)
+echo "RegisteredStatusNotifierItems:"
+echo "$items"
+dest=$(printf '%s\n' "$items" | grep -oE '":[0-9.]+/org/ayatana/NotificationItem/MedKit"' \
+  | head -n1 | sed 's/^"//; s|/.*||')
+if [[ -z "${dest}" ]]; then
+  echo "MedKit tray item: NOT REGISTERED"
+  exit 1
+fi
+echo "MedKit bus name: ${dest}"
+gdbus call --session --dest "${dest}" --object-path /org/ayatana/NotificationItem/MedKit \
+  --method org.freedesktop.DBus.Properties.GetAll org.kde.StatusNotifierItem

@@ -1,0 +1,7 @@
+[Unit]
+Description=MedKit — append the daily adherence summary to the health vault
+Documentation=file:%h/medkit/README.md
+
+[Service]
+Type=oneshot
+ExecStart=%h/medkit/bin/medkit --vault-summary

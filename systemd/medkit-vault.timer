@@ -1,0 +1,11 @@
+[Unit]
+Description=MedKit — daily 21:30 health-vault summary
+
+[Timer]
+OnCalendar=*-*-* 21:30:00
+Persistent=true
+RandomizedDelaySec=30
+Unit=medkit-vault.service
+
+[Install]
+WantedBy=timers.target
