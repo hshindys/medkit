@@ -55,6 +55,11 @@ def emergency_log() -> Path:
     return data_dir() / "emergency.log"
 
 
+def dashboard_command_file() -> Path:
+    # One-shot command channel from the CLI into a running dashboard process.
+    return data_dir() / "dashboard.cmd"
+
+
 def icon_dir() -> Path:
     return data_dir() / "icons"
 

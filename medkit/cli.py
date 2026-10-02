@@ -29,7 +29,39 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="print one JSON status line (for the omarchy bar widget)",
     )
+    group.add_argument(
+        "--plugin-panel",
+        action="store_true",
+        help="print the full JSON payload behind the omarchy panel",
+    )
+    group.add_argument(
+        "--notify-due",
+        metavar="TAB",
+        help="notify about the doses in one panel tab that are due now",
+    )
     group.add_argument("--wizard", action="store_true", help="open the pill-count wizard")
+    group.add_argument(
+        "--refill",
+        nargs="?",
+        const="",
+        metavar="NAME",
+        help="top up every medicine that is low, or just one medicine by name",
+    )
+    group.add_argument(
+        "--add-medicine",
+        action="store_true",
+        help="open the dashboard with the add-medicine dialog ready",
+    )
+    group.add_argument(
+        "--edit",
+        metavar="NAME",
+        help="open the dashboard with the edit dialog ready for one medicine",
+    )
+    group.add_argument(
+        "--delete",
+        metavar="NAME",
+        help="open the dashboard with the delete confirmation ready for one medicine",
+    )
     group.add_argument("--tick", action="store_true", help="evaluate the schedule and notify")
     group.add_argument("--vault-summary", action="store_true", help="append today's summary to the health vault")
     group.add_argument("--headless-test", action="store_true", help="run the logic self test")
@@ -107,6 +139,20 @@ def _dashboard_toggle() -> int:
     if _dashboard_pid() is None:
         _dashboard_pid_file().write_text(str(child_pid))
     print("dashboard opened")
+    return 0
+
+
+def _request_dashboard_action(action: str) -> int:
+    # The dashboard is a separate GTK process, so the request travels as a
+    # one-shot file it polls: written before the process exists, consumed by
+    # whichever instance is alive (or the one this call is about to start).
+    paths.ensure_data_dir()
+    paths.dashboard_command_file().write_text(action + "\n")
+    if _dashboard_pid() is None:
+        _dashboard_pid_file().unlink(missing_ok=True)
+        child_pid = _spawn_dashboard()
+        _dashboard_pid_file().write_text(str(child_pid))
+    print(f"dashboard action requested: {action}")
     return 0
 
 
@@ -241,8 +287,36 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {error}", file=sys.stderr)
             return 1
         return 0
+    if args.refill is not None:
+        try:
+            message = (
+                actions.refill_one(args.refill)
+                if args.refill
+                else actions.refill_low()
+            )
+        except actions.ActionError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
+        print(message)
+        return 0
+    if args.add_medicine:
+        return _request_dashboard_action("add")
+    if args.edit:
+        return _request_dashboard_action(f"edit:{args.edit}")
+    if args.delete:
+        return _request_dashboard_action(f"delete:{args.delete}")
     if args.dashboard_toggle:
         return _dashboard_toggle()
+    if args.plugin_panel:
+        from . import panel_data
+
+        print(json.dumps(panel_data.payload(), ensure_ascii=False))
+        return 0
+    if args.notify_due:
+        from . import panel_data
+
+        print(json.dumps(panel_data.notify_due(args.notify_due), ensure_ascii=False))
+        return 0
     if args.plugin_status:
         return _plugin_status()
     if args.status:

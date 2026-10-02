@@ -23,6 +23,8 @@ needed — `/usr/lib/libayatana-appindicator3.so.1` is present on this machine.
 ~/medkit/bin/medkit --take "Evening pill"     # mark the next dose as taken
 ~/medkit/bin/medkit --skip "Evening pill"     # mark the next dose as skipped
 ~/medkit/bin/medkit --set-count "Evening pill" 24
+~/medkit/bin/medkit --edit "Evening pill"    # dashboard opens on that medicine's form
+~/medkit/bin/medkit --delete "Evening pill"  # dashboard asks before dropping it
 ~/medkit/bin/medkit --test-notify       # fire one real notification
 ~/medkit/bin/medkit --headless-test     # logic self test (sandboxed)
 ~/medkit/bin/medkit-sni                 # prove the tray icon is registered on the bus
@@ -72,13 +74,24 @@ GUI: tray → *Manage medicines* → `+` / edit / delete. Fields:
 | `refill_at` | warn at or below this many pills (default `2`) |
 | `notes` | e.g. `بعد الأكل، مش على معدة فاضية` |
 | `category` | `normal` or `emergency` |
+| `days` | course length in days (`0` = ongoing) |
 | `active` | inactive medicines are not scheduled |
 | `emergency_contacts` | shown with emergency alerts |
+
+Every row carries its own **Edit** and **Delete** button — in *MEDICINES*,
+beside each dose in *TODAY'S DOSES*, in the red EMERGENCY section, in the
+**EMERGENCY** window, and in the bar panel. One form covers editing: name,
+dose, times, stock, refill point, course days, notes, category and contacts —
+and it carries **Delete** too, so an existing medicine can be dropped from the
+form itself. Every delete asks *"Delete …? Its dose history stays in the log."*
+first; nothing is ever removed silently.
 
 Everything is plain JSON — edit `~/.local/share/medkit/medicines.json` if you
 prefer.
 
-CLI equivalents: `--set-count NAME N`, `--take NAME`, `--skip NAME`.
+CLI equivalents: `--set-count NAME N`, `--take NAME`, `--skip NAME`,
+`--edit NAME` (opens the dashboard straight onto that medicine's form),
+`--delete NAME` (opens the dashboard on that medicine's delete confirmation).
 
 ### Emergency medicines
 
@@ -90,8 +103,12 @@ top of the dashboard, a one-click **EMERGENCY** button that opens the list with
 
 Quick add from that red section (or from the **EMERGENCY** window): only three
 fields — medicine name, time (`HH:MM`, comma separated for several) and how
-many days the course lasts (`0` = ongoing). Everything else stays editable
-from *MEDICINES → Edit*.
+many days the course lasts (`0` = ongoing).
+
+Every emergency row shows that course length (`for N days`, or `ongoing`) and
+sits beside **Edit** and **Delete**, so the times, the medicine and the number
+of days are all reachable — and the medicine removable — from the red section,
+the **EMERGENCY** window or the bar panel, no trip through *MEDICINES* needed.
 
 ---
 
@@ -155,8 +172,11 @@ o.bind("SUPER + SHIFT + N", "MedKit status", "alacritty -e ~/medkit/bin/medkit -
 ## Bar widget (Omarchy plugin)
 
 `plugin/` holds a Quickshell bar widget — status dot, next dose time, daily
-progress and low-stock warnings; click toggles the dashboard. It is published
-as its own repository:
+progress and low-stock warnings; click toggles a dose panel (doses, low stock,
+emergency) and each of its rows carries **Take** / **Skip** / **Edit** /
+**Delete**, where **Edit** opens the dashboard straight on that medicine's form
+(time, dose, and course days for emergencies) and **Delete** opens the
+dashboard on its delete confirmation. It is published as its own repository:
 
 ```bash
 omarchy plugin add https://github.com/hshindys/omarchy-medkit.git --enable

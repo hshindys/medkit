@@ -283,6 +283,55 @@ def run() -> int:
         f"files={sandbox_files}",
     )
 
+    from .cli import build_parser
+
+    parser = build_parser()
+    refill_one_args = parser.parse_args(["--refill", "Omega sample"])
+    refill_all_args = parser.parse_args(["--refill"])
+    add_args = parser.parse_args(["--add-medicine"])
+    edit_args = parser.parse_args(["--edit", "banadoll"])
+    delete_args = parser.parse_args(["--delete", "banadoll"])
+    harness.check(
+        "refill, add-medicine, edit and delete flags parse",
+        refill_one_args.refill == "Omega sample"
+        and refill_all_args.refill == ""
+        and add_args.add_medicine is True
+        and edit_args.edit == "banadoll"
+        and delete_args.delete == "banadoll"
+        and parser.parse_args([]).edit is None
+        and parser.parse_args([]).delete is None,
+        f"one={refill_one_args.refill!r} all={refill_all_args.refill!r} "
+        f"add={add_args.add_medicine} edit={edit_args.edit!r} "
+        f"delete={delete_args.delete!r}",
+    )
+
+    low_one = load_medicines().medicines[-1]
+    actions.set_count(low_one.name, 1)
+    refilled = actions.refill_one(low_one.name)
+    expected_stock = max(30, low_one.refill_at + 1)
+    harness.check(
+        "refill tops a single medicine back up",
+        load_medicines().by_name(low_one.name).stock == expected_stock,
+        f"{refilled} (expected {expected_stock})",
+    )
+
+    actions.add_medicine(
+        Medicine(name="Selftest discard", dose="1 mg", times=["12:00"])
+    )
+    removed = actions.delete_medicine("Selftest discard")
+    unknown_error = ""
+    try:
+        actions.delete_medicine("Selftest discard")
+    except actions.ActionError as error:
+        unknown_error = str(error)
+    harness.check(
+        "delete drops a medicine and refuses an unknown name",
+        load_medicines().by_name("Selftest discard") is None
+        and removed == "deleted Selftest discard"
+        and "unknown medicine" in unknown_error,
+        f"{removed} / error={unknown_error!r}",
+    )
+
     harness.report()
     print("\n--- history.jsonl ---")
     print(paths.history_file().read_text(encoding="utf-8").strip())

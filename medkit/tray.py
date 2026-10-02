@@ -40,6 +40,10 @@ class TrayApp(Gtk.Application):
             self._ensure_indicator()
         self._refresh()
         GLib.timeout_add_seconds(REFRESH_SECONDS, self._refresh_tick)
+        if self.mode == "dashboard":
+            # A CLI request (e.g. `medkit --add-medicine`) travels as a
+            # one-shot file; pick it up promptly instead of on the 15s tick.
+            GLib.timeout_add(400, self._poll_pending_command)
 
     def do_activate(self) -> None:
         if self.mode != "dashboard":
@@ -50,6 +54,7 @@ class TrayApp(Gtk.Application):
             self.open_wizard()
         elif self.mode == "dashboard":
             self.open_dashboard()
+            self._poll_pending_command()
         elif not self.ever_activated and not document.wizard_done:
             self.open_wizard()
         elif not self.ever_activated:
@@ -167,6 +172,34 @@ class TrayApp(Gtk.Application):
                 self.dashboard.connect("destroy", lambda *_: self.quit())
         self.dashboard.refresh()
         self.dashboard.present()
+
+    def _poll_pending_command(self) -> bool:
+        path = paths.dashboard_command_file()
+        try:
+            raw = path.read_text().strip()
+        except OSError:
+            return True
+        if not raw:
+            return True
+        try:
+            path.unlink()
+        except OSError:
+            pass
+        if raw == "add":
+            self.open_dashboard()
+            if self.dashboard is not None:
+                self.dashboard.show_add_dialog()
+        elif raw.startswith("edit:"):
+            name = raw.split(":", 1)[1].strip()
+            self.open_dashboard()
+            if self.dashboard is not None and name:
+                self.dashboard.show_edit_dialog(name)
+        elif raw.startswith("delete:"):
+            name = raw.split(":", 1)[1].strip()
+            self.open_dashboard()
+            if self.dashboard is not None and name:
+                self.dashboard.show_delete_confirm(name)
+        return True
 
     def _on_dashboard_destroyed(self, window: Gtk.Window) -> None:
         if self.dashboard is window:

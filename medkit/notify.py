@@ -4,6 +4,7 @@ import hashlib
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 
 from . import paths
 from .store import load_state, save_state
@@ -20,6 +21,10 @@ class Notice:
     medicine: str = ""
     urgency: str = "normal"
     emergency_line: str | None = None
+    # Path to this medicine's own pill image. Notifications that carry it are
+    # recognisable at a glance — the same capsule, tablet or bottle the panel
+    # draws on the card — instead of one generic clock for every reminder.
+    icon: str = ""
 
     def validate(self) -> None:
         if self.urgency not in URGENCIES:
@@ -63,6 +68,9 @@ class Notifier:
         return True
 
     def _send(self, notice: Notice) -> str:
+        icon = notice.icon if notice.icon and Path(notice.icon).exists() else ""
+        if not icon:
+            icon = "dialog-warning" if notice.urgency == "critical" else "appointment-soon"
         command = [
             "notify-send",
             "-a",
@@ -70,7 +78,7 @@ class Notifier:
             "-u",
             notice.urgency,
             "-i",
-            "appointment-soon" if notice.urgency != "critical" else "dialog-warning",
+            icon,
             "-h",
             f"string:x-canonical-private-synchronous:{_slug(notice.key)}",
             "-p",

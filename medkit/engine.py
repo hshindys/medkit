@@ -18,6 +18,24 @@ COLOR_GREEN = "green"
 COLOR_AMBER = "amber"
 COLOR_RED = "red"
 
+# The panel splits the day into three windows plus an as-needed bucket. The
+# boundaries follow the day's own rhythm rather than a clock face: morning
+# runs from before Fajr to just before Dhuhr, evening from Dhuhr to before
+# Maghrib, and night takes everything from Maghrib back around to Fajr. Every
+# hour lands in exactly one bucket, so no dose can hide between tabs.
+TAB_MORNING = "morning"
+TAB_EVENING = "evening"
+TAB_NIGHT = "night"
+TAB_EMERGENCY = "emergency"
+TABS = (TAB_MORNING, TAB_EVENING, TAB_NIGHT, TAB_EMERGENCY)
+
+TAB_LABELS = {
+    TAB_MORNING: "Morning",
+    TAB_EVENING: "Evening",
+    TAB_NIGHT: "Night",
+    TAB_EMERGENCY: "Emergency",
+}
+
 COLOR_LABELS = {
     COLOR_NEUTRAL: "nothing due yet",
     COLOR_GREEN: "all doses taken",
@@ -59,6 +77,14 @@ class Dose:
     def label(self) -> str:
         dose = f" {self.medicine.dose}" if self.medicine.dose else ""
         return f"{self.clock} {self.medicine.name}{dose}"
+
+    @property
+    def hour(self) -> int:
+        return self.when.hour
+
+    @property
+    def tab(self) -> str:
+        return tab_for(self.medicine, self.hour)
 
 
 @dataclass
@@ -105,6 +131,27 @@ class DayStatus:
         return self.emergency_out + [
             medicine for medicine in self.emergency_low if medicine not in self.emergency_out
         ]
+
+
+def bucket_for(hour: int) -> str:
+    """Which time-of-day window an hour belongs to (24 h, wrap-around)."""
+    if 5 <= hour <= 11:
+        return TAB_MORNING
+    if 12 <= hour <= 17:
+        return TAB_EVENING
+    return TAB_NIGHT
+
+
+def tab_for(medicine: Medicine, hour: int) -> str:
+    """Emergency / occasional medicines get their own tab, whatever the hour.
+
+    `days` is the "every N days" schedule: anything not taken daily is by
+    definition not part of a morning/evening/night routine, so it belongs
+    with the as-needed shelf rather than pretending to a time window.
+    """
+    if medicine.is_emergency or medicine.days > 0:
+        return TAB_EMERGENCY
+    return bucket_for(hour)
 
 
 def build_doses(

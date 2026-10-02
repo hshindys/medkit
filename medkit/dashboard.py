@@ -5,6 +5,7 @@ from datetime import datetime
 import gi
 
 gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
 gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gdk, GdkPixbuf, GLib, Gtk, Pango
 
@@ -12,6 +13,8 @@ from . import actions, art, engine
 from .engine import COLOR_LABELS, DayStatus, Dose
 from .models import Medicine
 from .store import MedicineFile
+
+RESPONSE_DELETE = 100
 
 CSS = """
 window {
@@ -199,6 +202,7 @@ class Dashboard(Gtk.Window):
         self.hint.set_no_show_all(True)
         shell.pack_end(self.hint, False, False, 0)
         self._hint_source: int | None = None
+        self._form_open = False
 
         self.refresh()
 
@@ -359,9 +363,21 @@ class Dashboard(Gtk.Window):
         info.pack_start(line2, False, True, 0)
         box.pack_start(info, True, True, 0)
 
+        actions_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        name = dose.medicine.name
+        actions_box.pack_end(
+            _button("Delete", lambda *_: self._delete_medicine(name), "btn-del"),
+            False,
+            False,
+            0,
+        )
+        actions_box.pack_end(
+            _button("Edit", lambda *_: self._edit_medicine(name), "btn-edit"),
+            False,
+            False,
+            0,
+        )
         if not dose.taken:
-            actions_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-            name = dose.medicine.name
             actions_box.pack_end(
                 _button("Skip", lambda *_: self._act(actions.mark_skipped, name), "btn-skip"),
                 False,
@@ -374,7 +390,7 @@ class Dashboard(Gtk.Window):
                 False,
                 0,
             )
-            box.pack_end(actions_box, False, False, 0)
+        box.pack_end(actions_box, False, False, 0)
 
         wrap = Gtk.EventBox()
         wrap.add_events(
@@ -385,7 +401,9 @@ class Dashboard(Gtk.Window):
         _add_class(wrap, "row")
         if dose.taken:
             _add_class(wrap, "row-off")
-        wrap.set_tooltip_text("Log this dose with Take, or ignore it with Skip")
+        wrap.set_tooltip_text(
+            "Edit time/dose/course · Take logs the dose · Skip ignores it · Delete removes the medicine"
+        )
         wrap.add(box)
         return wrap
 
@@ -466,6 +484,8 @@ class Dashboard(Gtk.Window):
             times.pack_start(self._chip(clock, "chip-time"), False, False, 0)
         if medicine.days:
             times.pack_start(self._chip(f"{medicine.days}-day course", "chip-time"), False, False, 0)
+        elif medicine.is_emergency:
+            times.pack_start(self._chip("ongoing", "chip-idle"), False, False, 0)
         if medicine.notes:
             times.pack_start(_label(medicine.notes, "muted", ellipsize=True), True, True, 0)
         times.pack_end(self._stock_chip(medicine), False, False, 0)
@@ -521,9 +541,26 @@ class Dashboard(Gtk.Window):
             clocks.pack_start(self._chip(clock, "chip-time"), False, False, 0)
         text.pack_start(clocks, False, False, 0)
         box.pack_start(text, True, True, 0)
+        box.pack_end(
+            _button(
+                "Delete",
+                lambda *_: self._delete_medicine(medicine.name),
+                "btn-del",
+            ),
+            False,
+            False,
+            0,
+        )
+        box.pack_end(
+            _button("Edit", lambda *_: self._edit_medicine(medicine.name), "btn-edit"),
+            False,
+            False,
+            0,
+        )
         box.pack_end(self._stock_chip(medicine), False, False, 0)
-        if medicine.days:
-            box.pack_end(self._chip(f"for {medicine.days} days", "chip-time"), False, False, 0)
+        if medicine.is_emergency:
+            course = f"for {medicine.days} days" if medicine.days else "ongoing"
+            box.pack_end(self._chip(course, "chip-time"), False, False, 0)
         return box
 
     def _adherence(self, document: MedicineFile, history) -> Gtk.Widget:
@@ -592,13 +629,38 @@ class Dashboard(Gtk.Window):
         self._say(message)
         self.refresh()
 
+    def show_add_dialog(self) -> None:
+        """Open the add-medicine form, on request from the bar panel."""
+        self._open_form(None)
+
+    def show_edit_dialog(self, name: str) -> None:
+        """Open the edit form for one medicine, on request from the bar panel."""
+        self._open_form(name)
+
+    def show_delete_confirm(self, name: str) -> None:
+        """Ask before dropping one medicine, on request from the bar panel."""
+        self._delete_medicine(name)
+
+    def _open_form(self, name: str | None) -> None:
+        if self._form_open:
+            return
+        self._form_open = True
+        try:
+            self._edit_medicine(name)
+        finally:
+            self._form_open = False
+
     def _edit_medicine(self, name: str | None, *_ignored, emergency: bool = False) -> None:
         document, _, _ = actions.snapshot()
         existing = document.by_name(name) if name else None
         form = MedicineForm(self, existing, emergency=emergency)
         response = form.run()
-        medicine = form.value()
+        medicine = form.value() if response != RESPONSE_DELETE else None
         form.destroy()
+        if response == RESPONSE_DELETE:
+            if existing is not None:
+                self._delete_medicine(existing.name)
+            return
         if response != Gtk.ResponseType.OK or medicine is None:
             return
         try:
@@ -627,9 +689,11 @@ class Dashboard(Gtk.Window):
         self._say(message)
         self.refresh()
 
-    def _delete_medicine(self, name: str, *_ignored) -> None:
+    def _delete_medicine(
+        self, name: str, *_ignored, transient: Gtk.Window | None = None
+    ) -> None:
         confirm = Gtk.MessageDialog(
-            transient_for=self,
+            transient_for=transient if transient is not None else self,
             flags=Gtk.DialogFlags.MODAL,
             message_type=Gtk.MessageType.WARNING,
             buttons=Gtk.ButtonsType.YES_NO,
@@ -699,6 +763,18 @@ class EmergencyWindow(Gtk.Window):
             self._parent_win._add_emergency()
             self._rebuild()
 
+    def _edit(self, name: str, *_ignored) -> None:
+        if self._parent_win is None:
+            return
+        self._parent_win._edit_medicine(name)
+        self._rebuild()
+
+    def _delete(self, name: str, *_ignored) -> None:
+        if self._parent_win is None:
+            return
+        self._parent_win._delete_medicine(name, transient=self)
+        self._rebuild()
+
     def _rebuild(self) -> None:
         for child in self._rows.get_children():
             self._rows.remove(child)
@@ -726,13 +802,16 @@ class EmergencyWindow(Gtk.Window):
             for clock in medicine.times:
                 name_box.pack_start(self._chip(clock, "chip-time"), False, False, 0)
         head.pack_start(name_box, True, True, 0)
+        name = medicine.name
+        head.pack_end(_button("Delete", lambda *_: self._delete(name), "btn-del"), False, False, 0)
+        head.pack_end(_button("Edit", lambda *_: self._edit(name), "btn-edit"), False, False, 0)
         state = "OUT OF STOCK" if medicine.is_out() else ("LOW" if medicine.is_low() else "ok")
         chip_css = "chip-late" if medicine.is_out() else ("chip-due" if medicine.is_low() else "chip-taken")
         head.pack_end(self._chip(state, chip_css), False, False, 0)
         stock = "not counted" if medicine.stock is None else str(medicine.stock)
         head.pack_end(self._chip(f"{stock} pills", "chip-stock"), False, False, 0)
-        if medicine.days:
-            head.pack_end(self._chip(f"for {medicine.days} days", "chip-time"), False, False, 0)
+        course = f"for {medicine.days} days" if medicine.days else "ongoing"
+        head.pack_end(self._chip(course, "chip-time"), False, False, 0)
         card.pack_start(head, False, False, 0)
         if medicine.notes:
             card.pack_start(_label(f"Note: {medicine.notes}", "muted"), False, False, 0)
@@ -823,6 +902,9 @@ class MedicineForm(Gtk.Dialog):
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
             Gtk.STOCK_OK, Gtk.ResponseType.OK,
         )
+        if medicine is not None:
+            delete_button = self.add_button("Delete", RESPONSE_DELETE)
+            _add_class(delete_button, "btn-del")
         self.set_default_size(440, 500)
         self.medicine = medicine
 

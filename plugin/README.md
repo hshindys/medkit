@@ -5,6 +5,11 @@ colored status dot plus the next dose time, today's progress, and a low-stock
 warning.
 
 - **Left / right click** — open the MedKit dashboard; click again to close it.
+- **Edit** on a dose card (or a low-stock row) opens the dashboard straight on
+  that medicine's edit form — time, dose, and course days when it is an
+  emergency.
+- **Delete** on a dose card (or a low-stock row) opens the dashboard on that
+  medicine's confirmation dialog — the panel never deletes on its own.
 - **Hover** — tooltip with next dose, doses taken, and low-stock count.
 - The dot is green (all done), amber (a dose is due / stock low), red
   (overdue or emergency supply low), gray (nothing due yet).
@@ -16,7 +21,8 @@ The tracker itself lives in [`hshindys/medkit`](https://github.com/hshindys/medk
 ## Requirements
 
 - [MedKit](https://github.com/hshindys/medkit) checked out at `~/medkit`
-  (`bin/medkit` provides `--plugin-status` and `--dashboard-toggle`).
+  (`bin/medkit` provides `--plugin-panel`, `--take`, `--skip`, `--refill`,
+  `--add-medicine`, `--edit`, `--delete`, `--notify-due` and `--dashboard-toggle`).
 - Omarchy shell (Quickshell bar).
 
 ```sh
@@ -68,8 +74,17 @@ the widget from the bar. It touches nothing else — MedKit itself, its data
 | File | Purpose |
 |---|---|
 | `manifest.json` | Omarchy plugin manifest (id `hshindys.medkit`) |
-| `MedKitBar.qml` | the bar widget |
+| `MedKitBar.qml` | the bar widget: data, actions, panel host |
+| `Panel.qml` | the click-open dose panel (tabs, doses, low stock, footer) |
+| `DoseCard.qml` | one dose: Take · Skip · Edit |
+| `ChipButton.qml` | the tinted pill button every action uses |
+| `PillIcon.qml` | the medicine's own pill glyph |
 | `LICENSE` | MIT |
+
+Editing these locally: the shell logs `Local plugin changed, reloading`, but a
+widget that still shows the old code needs `omarchy restart shell` (the shell
+ships with `QS_DISABLE_FILE_WATCHER=1`, so a reload can leave the old engine
+generation in place).
 
 ## Versioning
 

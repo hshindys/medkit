@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "hshindys.medkit",
   "name": "MedKit",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "author": "hshindys",
-  "description": "Medication status in the bar: next dose time, daily progress and low-stock warnings. Click to open or close the MedKit dashboard.",
+  "description": "Medication status in the bar: a pill mark, next dose time, daily progress and low-stock warnings. Click to open the dose panel (morning, evening, night and as-needed tabs); right-click opens the MedKit dashboard.",
   "kinds": [
     "bar-widget"
   ],
@@ -13,7 +13,7 @@
   },
   "barWidget": {
     "displayName": "MedKit",
-    "description": "Next dose time and stock warnings; click toggles the dashboard",
+    "description": "Pill mark plus next dose time and stock warnings; click for the dose panel, right-click for the dashboard",
     "category": "Status",
     "allowMultiple": false,
     "defaultSection": "right"

@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from . import engine
-from .engine import DayStatus, Dose
+from . import art, engine
+from .engine import DayStatus, Dose, TAB_LABELS
 from .notify import Notice, Notifier
 from .store import append_history, load_medicines, read_history
 
@@ -18,6 +18,14 @@ class TickReport:
     ids: list[str] = field(default_factory=list)
     setup_pending: bool = False
     lines: list[str] = field(default_factory=list)
+
+
+def pill_icon(name: str, size: int = 64) -> str:
+    """This medicine's own pill image, or "" when it cannot be rendered."""
+    try:
+        return str(art.pill_png(name, size))
+    except Exception:  # art needs PIL; a missing icon must never block a reminder
+        return ""
 
 
 def _dose_body(dose: Dose) -> str:
@@ -45,6 +53,7 @@ def build_notices(status: DayStatus, now: datetime) -> list[Notice]:
                 summary=f"EMERGENCY: {medicine.name} OUT OF STOCK",
                 body=f"0 pills remaining. Refill now.{contacts}",
                 urgency="critical",
+                icon=pill_icon(medicine.name),
                 emergency_line=(
                     f"{now.isoformat(timespec='seconds')} OUT-OF-STOCK "
                     f"{medicine.name} dose={medicine.dose or 'n/a'} remaining=0\n"
@@ -62,6 +71,7 @@ def build_notices(status: DayStatus, now: datetime) -> list[Notice]:
                 summary=f"OVERDUE: {dose.medicine.name}",
                 body=f"Was due {dose.clock}, {minutes} min ago · {_dose_body(dose)}",
                 urgency="critical",
+                icon=pill_icon(dose.medicine.name),
             )
         )
 
@@ -85,6 +95,7 @@ def build_notices(status: DayStatus, now: datetime) -> list[Notice]:
                     summary=title,
                     body=_dose_body(dose),
                     urgency="normal",
+                    icon=pill_icon(dose.medicine.name),
                 )
             )
 
@@ -105,6 +116,43 @@ def build_notices(status: DayStatus, now: datetime) -> list[Notice]:
                     f"(refill at {medicine.refill_at}).{contacts}"
                 ),
                 urgency="critical",
+                icon=pill_icon(medicine.name),
+            )
+        )
+    return notices
+
+
+def build_tab_notices(status: DayStatus, now: datetime, tab: str) -> list[Notice]:
+    """One notice for the doses in a panel tab that are due or overdue now.
+
+    The bar panel calls this when you open a tab, so the screen says what that
+    window of the day still owes you without your reading every card. Keyed per
+    dose per day, so reopening the same tab stays silent.
+    """
+    if not status.wizard_done or tab not in engine.TABS:
+        return []
+    day = now.date().isoformat()
+    notices: list[Notice] = []
+    for dose in status.doses:
+        if dose.taken or dose.tab != tab or dose.when > now:
+            continue
+        overdue = dose.is_overdue(now)
+        minutes = dose.minutes_overdue(now)
+        label = TAB_LABELS.get(tab, tab)
+        lead = f"Was due {dose.clock}, {minutes} min ago · " if overdue else f"Due {dose.clock} · "
+        notices.append(
+            Notice(
+                key=f"tab|{tab}|{dose.medicine.name}|{day}|{dose.clock}",
+                kind="overdue" if overdue else "reminder",
+                medicine=dose.medicine.name,
+                summary=(
+                    f"OVERDUE: {dose.medicine.name}"
+                    if overdue
+                    else f"Time for {dose.medicine.name}"
+                ),
+                body=f"{label} tab · {lead}{_dose_body(dose)}",
+                urgency="critical" if overdue else "normal",
+                icon=pill_icon(dose.medicine.name),
             )
         )
     return notices

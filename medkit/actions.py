@@ -95,6 +95,17 @@ def refill_low(target: int = 30) -> str:
     return f"refilled {len(refilled)}: {', '.join(refilled)}"
 
 
+def refill_one(name: str, target: int = 30) -> str:
+    if target < 0:
+        raise ActionError("count cannot be negative")
+    document = load_medicines()
+    medicine = _require(document, name)
+    new_count = max(target, medicine.refill_at + 1)
+    medicine.stock = new_count
+    save_medicines(document)
+    return f"refilled {name}: stock set to {new_count}"
+
+
 def complete_setup(counts: dict[str, int]) -> str:
     document = load_medicines()
     for name, count in counts.items():
