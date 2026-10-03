@@ -719,8 +719,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.test_notify:
         return _test_notify()
     if args.tick:
-        from . import tick
+        from . import art, tick
 
+        art.purge_stale()
         report = tick.run_tick(dispatch=not args.dry_run)
         stamp = report.now.strftime("%Y-%m-%d %H:%M:%S")
         print(f"medkit tick {stamp}")
@@ -783,8 +784,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.dashboard_toggle:
         return _dashboard_toggle()
     if args.plugin_panel:
-        from . import panel_data
+        from . import art, panel_data
 
+        art.purge_stale()
         print(json.dumps(panel_data.payload(), ensure_ascii=False))
         return 0
     if args.notify_due:
