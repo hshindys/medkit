@@ -21,16 +21,17 @@ Column {
   readonly property color dim2: Qt.darker(root.foreground, 2.0)
 
   function severityColor(severity) {
-    if (severity === "severe" || severity === "contraindicated") return "#ef4444"
-    if (severity === "moderate" || severity === "avoid") return "#f59e0b"
-    return "#38bdf8"
+    if (severity === "severe" || severity === "contraindicated") return Theme.danger
+    if (severity === "moderate" || severity === "avoid") return Theme.accentDim
+    return Theme.mild
   }
 
   Block {
     width: parent.width
     title: "MEDICATION REVIEW"
+    glyph: Theme.glyphReports
     meta: reviewData.due ? "DUE NOW" : "SCHEDULED"
-    tint: reviewData.due ? "#f59e0b" : "#22c55e"
+    tint: reviewData.due ? Theme.accentDim : Theme.stateOk
 
     Row {
       width: parent.width
@@ -65,7 +66,7 @@ Column {
         Text {
           textFormat: Text.PlainText
           text: String(reviewData.nextLabel || "never")
-          color: reviewData.due ? "#f59e0b" : root.foreground
+          color: reviewData.due ? Theme.accentDim : root.foreground
           font.family: root.fontFamily
           font.pixelSize: Style.font.title
           font.bold: true
@@ -140,7 +141,7 @@ Column {
 
       ChipButton {
         text: "Export PDF"
-        tint: "#7c3aed"
+        tint: Theme.accentDim
         filled: true
         fontFamily: root.fontFamily
         onClicked: if (root.host) root.host.reviewExport()
@@ -148,7 +149,7 @@ Column {
 
       ChipButton {
         text: "Reviewed today"
-        tint: "#22c55e"
+        tint: Theme.stateOk
         fontFamily: root.fontFamily
         onClicked: if (root.host) root.host.reviewDone()
       }
@@ -158,8 +159,9 @@ Column {
   Block {
     width: parent.width
     title: "WEEKLY REPORT"
+    glyph: Theme.glyphChart
     meta: "LAST 7 DAYS"
-    tint: "#3b82f6"
+    tint: Theme.accentDim
 
     Repeater {
       model: reports.weekly ? reports.weekly.lines : []
@@ -173,7 +175,7 @@ Column {
         color: String(line.modelData || "").indexOf("##") === 0
           ? root.foreground
           : (String(line.modelData || "").indexOf("BELOW") >= 0
-              || String(line.modelData || "").indexOf("OUT") >= 0 ? "#ef4444" : root.dim2)
+              || String(line.modelData || "").indexOf("OUT") >= 0 ? Theme.danger : root.dim2)
         font.family: root.fontFamily
         font.pixelSize: Style.font.caption
         font.bold: String(line.modelData || "").indexOf("##") === 0
@@ -184,8 +186,9 @@ Column {
   Block {
     width: parent.width
     title: "MONTHLY REPORT"
+    glyph: Theme.glyphChart
     meta: "LAST 30 DAYS"
-    tint: "#a78bfa"
+    tint: Theme.accentDim
 
     Repeater {
       model: reports.monthly ? reports.monthly.lines : []
@@ -198,7 +201,7 @@ Column {
         text: String(mline.modelData || "")
         color: String(mline.modelData || "").indexOf("##") === 0
           ? root.foreground
-          : (String(mline.modelData || "").indexOf("REPEAT") >= 0 ? "#ef4444" : root.dim2)
+          : (String(mline.modelData || "").indexOf("REPEAT") >= 0 ? Theme.danger : root.dim2)
         font.family: root.fontFamily
         font.pixelSize: Style.font.caption
         font.bold: String(mline.modelData || "").indexOf("##") === 0
@@ -209,8 +212,9 @@ Column {
   Block {
     width: parent.width
     title: "SOURCES"
+    glyph: Theme.glyphHelp
     meta: String(health.updated || "")
-    tint: "#64748b"
+    tint: Theme.fg3
 
     Text {
       width: parent.width

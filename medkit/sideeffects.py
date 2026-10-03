@@ -13,7 +13,7 @@ REPEAT_THRESHOLD = 3
 
 SEVERITIES = ("mild", "moderate", "severe")
 SEVERITY_LEVEL = {"mild": 1, "moderate": 2, "severe": 3}
-SEVERITY_COLOR = {"mild": "#38bdf8", "moderate": "#f59e0b", "severe": "#ef4444"}
+SEVERITY_COLOR = {"mild": "#8b919b", "moderate": "#9aa0a8", "severe": "#f2f4f7"}
 
 _NON_WORD = re.compile(r"[^a-z0-9\s]")
 _SPACES = re.compile(r"\s+")

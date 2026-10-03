@@ -53,7 +53,7 @@ class Wizard(Gtk.Window):
         box.pack_start(grid, False, False, 0)
 
         self.error_label = Gtk.Label(label="", xalign=0)
-        self.error_label.set_markup('<span foreground="#dc2626"></span>')
+        self.error_label.set_markup('<span foreground="#f2f4f7"></span>')
         box.pack_start(self.error_label, False, False, 0)
 
         buttons = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
@@ -84,7 +84,7 @@ class Wizard(Gtk.Window):
             message = actions.complete_setup(counts)
         except actions.ActionError as error:
             self.error_label.set_markup(
-                f'<span foreground="#dc2626">{error}</span>'
+                f'<span foreground="#f2f4f7">{error}</span>'
             )
             return
         dialog = Gtk.MessageDialog(

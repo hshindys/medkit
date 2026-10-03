@@ -68,12 +68,12 @@ def day_stats(
 
 def _color(value: float | None) -> str:
     if value is None:
-        return "#64748b"
+        return "#5a6068"
     if value >= ADHERENCE_THRESHOLD:
-        return "#22c55e"
+        return "#c3c8d0"
     if value >= 60:
-        return "#f59e0b"
-    return "#ef4444"
+        return "#9aa0a8"
+    return "#f2f4f7"
 
 
 def bar(value: float | None, width: int = 20) -> str:

@@ -22,9 +22,9 @@ Column {
   readonly property color dim2: Qt.darker(root.foreground, 2.0)
 
   function effectColor(severity) {
-    if (severity === "severe") return "#ef4444"
-    if (severity === "moderate") return "#f59e0b"
-    return "#38bdf8"
+    if (severity === "severe") return Theme.danger
+    if (severity === "moderate") return Theme.accentDim
+    return Theme.mild
   }
 
   function healthNumber(value, suffix) {
@@ -35,8 +35,9 @@ Column {
   Block {
     width: parent.width
     title: "ADHERENCE"
+    glyph: Theme.glyphTaken
     meta: String(adherence.threshold || 80) + "% TARGET"
-    tint: Number(adherence.weekly && adherence.weekly.below ? 1 : 0) ? "#ef4444" : "#22c55e"
+    tint: Number(adherence.weekly && adherence.weekly.below ? 1 : 0) ? Theme.danger : Theme.stateOk
 
     Row {
       width: parent.width
@@ -141,7 +142,7 @@ Column {
             anchors.bottom: parent.bottom
             height: parent.height * Math.max(0, Math.min(1, Number(dayBar.modelData.pct || 0) / 100))
             radius: Style.cornerRadius
-            color: String(dayBar.modelData.color || "#64748b")
+            color: String(dayBar.modelData.color || Theme.fg3)
           }
 
           Text {
@@ -169,7 +170,7 @@ Column {
             ? String(adherence.monthly.missed || 0) + " dose(s) missed in 30 days · "
               + String(adherence.monthly.belowDays || 0) + " day(s) under target"
             : "")
-      color: adherence.weekly && adherence.weekly.below ? "#ef4444" : root.dim
+      color: adherence.weekly && adherence.weekly.below ? Theme.danger : root.dim
       font.family: root.fontFamily
       font.pixelSize: Style.font.body
       font.bold: adherence.weekly && adherence.weekly.below
@@ -179,8 +180,9 @@ Column {
   Block {
     width: parent.width
     title: "VITALS"
+    glyph: Theme.glyphChart
     meta: String((vitals.chart && vitals.chart.count) || 0) + " READINGS · 14 DAYS"
-    tint: "#38bdf8"
+    tint: Theme.mild
 
     Text {
       width: parent.width
@@ -271,7 +273,7 @@ Column {
                 return parts.join("  ·  ")
               })()
             : "→ no dose within the window"
-          color: (reading.modelData.doses && reading.modelData.doses.length > 0) ? "#22c55e" : root.dim
+          color: (reading.modelData.doses && reading.modelData.doses.length > 0) ? Theme.stateOk : root.dim
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
         }
@@ -282,8 +284,9 @@ Column {
   Block {
     width: parent.width
     title: "SIDE EFFECTS"
+    glyph: Theme.glyphWarn
     meta: String(effects.count || 0) + " IN 30 DAYS"
-    tint: Number((effects.repeats || []).length) > 0 ? "#ef4444" : "#a78bfa"
+    tint: Number((effects.repeats || []).length) > 0 ? Theme.danger : Theme.accentDim
 
     Repeater {
       model: effects.repeats || []
@@ -364,8 +367,9 @@ Column {
   Block {
     width: parent.width
     title: "SUPPLY"
+    glyph: Theme.glyphRefill
     meta: String(refills.countWarn || 0) + " NEED A REFILL"
-    tint: Number(refills.countWarn || 0) > 0 ? "#f59e0b" : "#22c55e"
+    tint: Number(refills.countWarn || 0) > 0 ? Theme.accentDim : Theme.stateOk
 
     Repeater {
       model: refills.medicines || []
@@ -386,7 +390,7 @@ Column {
                 ? " · " + String(stock.modelData.daysLeft) + "d @ " + String(stock.modelData.perDay) + "/day"
                 : "")
           elide: Text.ElideRight
-          color: stock.modelData.out ? "#ef4444" : root.foreground
+          color: stock.modelData.out ? Theme.danger : root.foreground
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           font.bold: true
@@ -400,7 +404,7 @@ Column {
           ChipButton {
             visible: stock.modelData.out === true
             text: "OUT"
-            tint: "#ef4444"
+            tint: Theme.danger
             filled: true
             fontFamily: root.fontFamily
             clickable: false
@@ -409,14 +413,14 @@ Column {
           ChipButton {
             visible: stock.modelData.warn === true && stock.modelData.out !== true
             text: "runs out " + String(stock.modelData.runOut || "")
-            tint: "#f59e0b"
+            tint: Theme.accentDim
             fontFamily: root.fontFamily
             clickable: false
           }
 
           ChipButton {
             text: "Refill"
-            tint: "#f59e0b"
+            tint: Theme.accentDim
             fontFamily: root.fontFamily
             onClicked: if (root.host) root.host.refill(stock.modelData.name)
           }
@@ -455,7 +459,7 @@ Column {
         id: pharmacyChip
         visible: refills.pharmacy !== undefined && Boolean(refills.pharmacy.phone)
         text: "Call pharmacy"
-        tint: "#38bdf8"
+        tint: Theme.mild
         fontFamily: root.fontFamily
         onClicked: if (root.host) root.host.callPharmacy()
       }

@@ -41,12 +41,25 @@ BarWidget {
   readonly property bool wizardDone: panelData.wizard !== false
   readonly property var health: panelData.health || ({})
 
+  // The mark speaks in luminance: near-white when a dose is due, light grey
+  // when today is done, mid grey when it is late, dim when nothing is up.
   readonly property string stateColorHex: {
-    var hex = { "green": "#22c55e", "amber": "#f59e0b", "red": "#ef4444" }[medkitState] || "#64748b"
+    var states = {
+      "green": Theme.stateOk,
+      "amber": Theme.stateDue,
+      "red": Theme.stateLate,
+      "neutral": Theme.stateIdle
+    }
+    var value = states[medkitState] || Theme.stateIdle
     if (lowCount > 0 && (medkitState === "neutral" || medkitState === "green"))
-      return "#f59e0b"
-    return hex
+      value = Theme.stateDue
+    return String(value.toString())
   }
+
+  // Motion on the mark: a 0.4s pulse while a dose is due, a 2s breath
+  // while stock is running out. Nothing else moves in the bar.
+  readonly property bool pulseDue: medkitState === "amber" && wizardDone
+  readonly property bool pulseLow: lowCount > 0 && !pulseDue && wizardDone
 
   // The bar's mark: a pill, tinted with today's state, instead of a bare dot.
   readonly property string pillGlyph: "󰐂"
@@ -365,18 +378,61 @@ BarWidget {
     anchors.rightMargin: Style.space(8)
     clip: true
 
-    Text {
+    Row {
       id: barLabel
       anchors.verticalCenter: parent.verticalCenter
       anchors.left: parent.left
-      width: root.vertical ? Style.space(12) : parent.width
-      textFormat: Text.RichText
-      text: "<span style='color:" + root.stateColorHex + ";'>" + root.pillGlyph + "</span>"
-        + (root.vertical ? "" : " " + root.labelText)
-      color: root.bar ? root.bar.barForeground : Color.foreground
-      font.family: root.bar ? root.bar.fontFamily : Style.font.family
-      font.pixelSize: Style.font.caption
-      verticalAlignment: Text.AlignVCenter
+      width: root.vertical ? Style.space(12) : implicitWidth
+      spacing: Style.space(5)
+
+      Text {
+        id: barGlyph
+        textFormat: Text.PlainText
+        text: root.pillGlyph
+        color: root.stateColorHex
+        font.family: root.bar ? root.bar.fontFamily : Style.font.family
+        font.pixelSize: Style.font.caption
+        opacity: 1
+      }
+
+      Text {
+        visible: !root.vertical
+        textFormat: Text.PlainText
+        text: root.labelText
+        color: root.bar ? root.bar.barForeground : Color.foreground
+        font.family: root.bar ? root.bar.fontFamily : Style.font.family
+        font.pixelSize: Style.font.caption
+      }
+
+      SequentialAnimation {
+        id: duePulse
+        running: root.pulseDue
+        loops: Animation.Infinite
+        onStopped: barGlyph.opacity = 1
+        NumberAnimation {
+          target: barGlyph; property: "opacity"
+          to: 0.55; duration: Theme.pulseDue; easing.type: Easing.InOutSine
+        }
+        NumberAnimation {
+          target: barGlyph; property: "opacity"
+          to: 1; duration: Theme.pulseDue; easing.type: Easing.InOutSine
+        }
+      }
+
+      SequentialAnimation {
+        id: lowBreathe
+        running: root.pulseLow
+        loops: Animation.Infinite
+        onStopped: barGlyph.opacity = 1
+        NumberAnimation {
+          target: barGlyph; property: "opacity"
+          to: 0.62; duration: Theme.breathe / 2; easing.type: Easing.InOutSine
+        }
+        NumberAnimation {
+          target: barGlyph; property: "opacity"
+          to: 1; duration: Theme.breathe / 2; easing.type: Easing.InOutSine
+        }
+      }
     }
   }
 

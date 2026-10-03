@@ -13,13 +13,13 @@ from . import store
 CORRELATION_WINDOW_HOURS = 4
 
 KINDS = {
-    "bp": {"label": "Blood pressure", "unit": "mmHg", "color": "#ef4444", "two": True},
-    "glucose": {"label": "Blood sugar", "unit": "mg/dL", "color": "#f59e0b", "two": False},
-    "sugar": {"label": "Blood sugar", "unit": "mg/dL", "color": "#f59e0b", "two": False},
-    "pulse": {"label": "Pulse", "unit": "bpm", "color": "#38bdf8", "two": False},
-    "weight": {"label": "Weight", "unit": "kg", "color": "#a78bfa", "two": False},
-    "spo2": {"label": "Oxygen saturation", "unit": "%", "color": "#22d3ee", "two": False},
-    "temp": {"label": "Temperature", "unit": "°C", "color": "#f97316", "two": False},
+    "bp": {"label": "Blood pressure", "unit": "mmHg", "color": "#f2f4f7", "two": True},
+    "glucose": {"label": "Blood sugar", "unit": "mg/dL", "color": "#9aa0a8", "two": False},
+    "sugar": {"label": "Blood sugar", "unit": "mg/dL", "color": "#9aa0a8", "two": False},
+    "pulse": {"label": "Pulse", "unit": "bpm", "color": "#8b919b", "two": False},
+    "weight": {"label": "Weight", "unit": "kg", "color": "#9aa0a8", "two": False},
+    "spo2": {"label": "Oxygen saturation", "unit": "%", "color": "#c3c8d0", "two": False},
+    "temp": {"label": "Temperature", "unit": "°C", "color": "#9aa0a8", "two": False},
 }
 
 _ALIASES = {

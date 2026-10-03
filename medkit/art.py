@@ -11,21 +11,21 @@ from . import paths
 SIZE = 96
 FRAMES = 16
 FRAME_MS = 110
-ART_VERSION = 2
+ART_VERSION = 3
 
 COLORS = (
-    "#38bdf8",
-    "#a78bfa",
-    "#f472b6",
-    "#facc15",
-    "#34d399",
-    "#fb923c",
-    "#f87171",
-    "#22d3ee",
-    "#4ade80",
-    "#e879f9",
-    "#fbbf24",
-    "#60a5fa",
+    "#f2f4f7",
+    "#e6e8ec",
+    "#d5d8dd",
+    "#c3c8d0",
+    "#b0b5bd",
+    "#9aa0a8",
+    "#8b919b",
+    "#767c85",
+    "#6a7078",
+    "#5a6068",
+    "#4d535a",
+    "#43484f",
 )
 
 # Every medicine gets its own *shape* as well as its own colour, so a row of
@@ -107,6 +107,29 @@ def pill_png(name: str, size: int = SIZE) -> Path:
     return path
 
 
+NEUTRAL_TOLERANCE = 20
+
+
+def _neutralize(image: Image.Image) -> Image.Image:
+    """Clamp rotation/resample ringing back onto the grayscale ramp.
+
+    Cubic kernels overshoot at the pill's edges and can land a handful of
+    pixels on a saturated rgb triple; the ramp itself never leaves a spread
+    of ~16 between its channels, so anything wider is ringing, not colour.
+    """
+    pixels = image.load()
+    width, height = image.size
+    for y in range(height):
+        for x in range(width):
+            red, green, blue, alpha = pixels[x, y]
+            if not alpha:
+                continue
+            if max(red, green, blue) - min(red, green, blue) > NEUTRAL_TOLERANCE:
+                gray = (red + green + blue) // 3
+                pixels[x, y] = (gray, gray, gray, alpha)
+    return image
+
+
 def _frame(angle: float, color: tuple[int, int, int], size: int, shape: str) -> Image.Image:
     scale = 2
     span = size * scale
@@ -114,14 +137,14 @@ def _frame(angle: float, color: tuple[int, int, int], size: int, shape: str) -> 
     rotated = pill.rotate(angle, resample=Image.BICUBIC, center=(span / 2, span / 2))
 
     shadow = Image.new("RGBA", (span, span), (0, 0, 0, 0))
-    shade_layer = Image.new("RGBA", (span, span), (8, 10, 16, 255))
+    shade_layer = Image.new("RGBA", (span, span), (10, 11, 13, 255))
     shade_layer.putalpha(rotated.getchannel("A").filter(ImageFilter.GaussianBlur(3)))
     shadow.paste(shade_layer, (0, 6 * scale // 2), shade_layer)
 
     canvas = Image.new("RGBA", (span, span), (0, 0, 0, 0))
     canvas.alpha_composite(shadow)
     canvas.alpha_composite(rotated)
-    return canvas.resize((size, size), Image.LANCZOS)
+    return _neutralize(canvas.resize((size, size), Image.LANCZOS))
 
 
 def _shape(shape: str, color: tuple[int, int, int], span: int, scale: int) -> Image.Image:
@@ -161,7 +184,7 @@ def _clamp(box, span: int) -> tuple[int, int, int, int]:
 
 
 def _outline(draw: ImageDraw.ImageDraw, box, radius: int, color, scale: int) -> None:
-    draw.rounded_rectangle(box, radius=radius, outline=(16, 20, 30, 110), width=2 * scale)
+    draw.rounded_rectangle(box, radius=radius, outline=(16, 17, 20, 110), width=2 * scale)
 
 
 def _glint(draw: ImageDraw.ImageDraw, box, span: int) -> None:
@@ -192,7 +215,7 @@ def _capsule(draw: ImageDraw.ImageDraw, color, span: int, scale: int) -> None:
         (right - 2 * radius, top, right, bottom), radius=radius, fill=(255, 255, 255, 255)
     )
     _outline(draw, (left, top, right, bottom), radius, color, scale)
-    draw.line((seam, top + 2, seam, bottom - 2), fill=(16, 20, 30, 70), width=scale)
+    draw.line((seam, top + 2, seam, bottom - 2), fill=(16, 17, 20, 70), width=scale)
     _glint(draw, (left + radius // 2, top + height // 4, seam - 4 * scale, top + height // 2 + 4), span)
 
 
@@ -208,7 +231,7 @@ def _tablet(draw: ImageDraw.ImageDraw, color, span: int, scale: int) -> None:
         fill=shade(color, -0.45) + (200,),
         width=2 * scale,
     )
-    draw.ellipse(box, outline=(16, 20, 30, 110), width=2 * scale)
+    draw.ellipse(box, outline=(16, 17, 20, 110), width=2 * scale)
     _glint(draw, (pad + 10 * scale, pad + 10 * scale, span // 2 - 6 * scale, pad + 34 * scale), span)
 
 
@@ -243,7 +266,7 @@ def _softgel(draw: ImageDraw.ImageDraw, color, span: int, scale: int) -> None:
     ring = _clamp((left + 6 * scale, top + 6 * scale, right - 6 * scale, bottom - 6 * scale), span)
     if ring[2] > ring[0] and ring[3] > ring[1]:
         draw.ellipse(ring, outline=shade(color, 0.35) + (160,), width=max(1, scale))
-    draw.ellipse((left, top, right, bottom), outline=(16, 20, 30, 110), width=2 * scale)
+    draw.ellipse((left, top, right, bottom), outline=(16, 17, 20, 110), width=2 * scale)
     _glint(draw, (left + 14 * scale, top + 8 * scale, left + 48 * scale, top + height // 2), span)
 
 
@@ -284,7 +307,7 @@ def _bottle(draw: ImageDraw.ImageDraw, color, span: int, scale: int) -> None:
         (cap_left, cap_top, cap_left + cap_w, cap_top + cap_h),
         radius=4 * scale,
         fill=shade(color, -0.4) + (255,),
-        outline=(16, 20, 30, 110),
+        outline=(16, 17, 20, 110),
         width=2 * scale,
     )
     _outline(draw, (body_left, body_top, body_right, body_bottom), radius, color, scale)
@@ -318,7 +341,7 @@ def _inhaler(draw: ImageDraw.ImageDraw, color, span: int, scale: int) -> None:
     )
     _fill(draw, (body_left + 6 * scale, body_top + int(body_h * 0.18),
                  body_right - 6 * scale, body_top + int(body_h * 0.46)),
-          span, (16, 20, 30, 150))
+          span, (16, 17, 20, 150))
     _fill(draw, (body_left + 10 * scale, body_top + int(body_h * 0.22),
                  body_right - 10 * scale, body_top + int(body_h * 0.32)),
           span, (255, 255, 255, 120))
@@ -384,6 +407,6 @@ def _drops(draw: ImageDraw.ImageDraw, color, span: int, scale: int) -> None:
                  body_right - 6 * scale, body_bottom - 10 * scale),
           span, (255, 255, 255, 90))
     draw.ellipse((body_left, body_top, body_right, body_bottom),
-                 outline=(16, 20, 30, 110), width=2 * scale)
+                 outline=(16, 17, 20, 110), width=2 * scale)
     _glint(draw, (body_left + 8 * scale, body_top + 12 * scale,
                   body_left + 26 * scale, body_top + 40 * scale), span)

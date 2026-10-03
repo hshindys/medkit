@@ -18,7 +18,7 @@ Column {
   readonly property var conditions: card.conditions || []
   readonly property color dim: Qt.darker(root.foreground, 1.5)
   readonly property color dim2: Qt.darker(root.foreground, 2.0)
-  readonly property color danger: "#ef4444"
+  readonly property color danger: Theme.danger
 
   spacing: Style.space(10)
 
@@ -86,8 +86,9 @@ Column {
   Block {
     width: parent.width
     title: "ALLERGIES"
+    glyph: Theme.glyphWarn
     meta: String(allergies.length) + " RECORDED"
-    tint: allergies.length > 0 ? root.danger : "#64748b"
+    tint: allergies.length > 0 ? root.danger : Theme.fg3
 
     Text {
       width: parent.width
@@ -106,8 +107,9 @@ Column {
   Block {
     width: parent.width
     title: "CHRONIC CONDITIONS"
+    glyph: Theme.glyphHealth
     visible: conditions.length > 0
-    tint: "#f59e0b"
+    tint: Theme.accentDim
 
     Text {
       width: parent.width
@@ -124,8 +126,9 @@ Column {
   Block {
     width: parent.width
     title: "MEDICAL STATUS"
+    glyph: Theme.glyphCard
     visible: String(card.status || "none") !== "none"
-    tint: "#a78bfa"
+    tint: Theme.accentDim
 
     Text {
       width: parent.width
@@ -141,8 +144,9 @@ Column {
   Block {
     width: parent.width
     title: "CURRENT MEDICATIONS"
+    glyph: Theme.glyphPill
     meta: String(meds.length) + " ACTIVE"
-    tint: "#3b82f6"
+    tint: Theme.accentDim
 
     Repeater {
       model: meds
@@ -178,8 +182,9 @@ Column {
   Block {
     width: parent.width
     title: "CONTACTS"
+    glyph: Theme.glyphHelp
     meta: String(numbers.length) + " NUMBERS"
-    tint: "#22c55e"
+    tint: Theme.stateOk
 
     Repeater {
       model: numbers
@@ -208,7 +213,7 @@ Column {
           id: callButton
           anchors.verticalCenter: parent.verticalCenter
           text: "Call"
-          tint: String(contact.modelData.tint || "#22c55e")
+          tint: String(contact.modelData.tint || Theme.stateOk)
           fontFamily: root.fontFamily
           onClicked: if (root.host) root.host.callTarget(String(contact.modelData.label || ""))
         }
@@ -222,7 +227,7 @@ Column {
 
     ChipButton {
       text: "Wallet card (.txt)"
-      tint: "#22c55e"
+      tint: Theme.stateOk
       filled: true
       fontFamily: root.fontFamily
       onClicked: if (root.host) root.host.exportCard("txt")
@@ -230,21 +235,21 @@ Column {
 
     ChipButton {
       text: "PDF"
-      tint: "#22c55e"
+      tint: Theme.stateOk
       fontFamily: root.fontFamily
       onClicked: if (root.host) root.host.exportCard("pdf")
     }
 
     ChipButton {
       text: "Edit profile"
-      tint: "#7c3aed"
+      tint: Theme.accentDim
       fontFamily: root.fontFamily
       onClicked: if (root.host) root.host.openDashboard()
     }
 
     ChipButton {
       text: "Refresh"
-      tint: "#38bdf8"
+      tint: Theme.mild
       fontFamily: root.fontFamily
       onClicked: if (root.host) root.host.refresh()
     }

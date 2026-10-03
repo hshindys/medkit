@@ -1,7 +1,12 @@
 import QtQuick
 import qs.Commons
 import qs.Ui
+import ".."
 
+// The panel's segmented control: five pills, one surface. The selected
+// segment is the brightest thing in the row (`bg3` + `fg0`), the rest sit
+// in `fg2` until you hover them — luminance carries the state, the glyph
+// says which view you are looking at.
 Row {
   id: root
 
@@ -14,6 +19,15 @@ Row {
 
   spacing: Style.space(6)
 
+  function glyphFor(id) {
+    if (id === "doses") return Theme.glyphPill
+    if (id === "safety") return Theme.glyphSafety
+    if (id === "health") return Theme.glyphHealth
+    if (id === "reports") return Theme.glyphReports
+    if (id === "card") return Theme.glyphCard
+    return Theme.glyphPill
+  }
+
   Repeater {
     model: root.model
 
@@ -23,7 +37,6 @@ Row {
       required property var modelData
 
       readonly property bool selected: root.current === String(seg.modelData.id)
-      readonly property color accent: String(seg.modelData.color || root.foreground)
       readonly property int badge: Number(seg.modelData.badge || 0)
 
       width: segRow.implicitWidth + Style.space(26)
@@ -31,10 +44,12 @@ Row {
 
       Rectangle {
         anchors.fill: parent
-        radius: Style.cornerRadius
+        radius: height / 2
         color: seg.selected
-          ? Util.alpha(seg.accent, 0.20)
-          : (segMouse.containsMouse ? Util.alpha(seg.accent, 0.10) : "transparent")
+          ? Theme.bg3
+          : (segMouse.containsMouse ? Theme.bg2 : "transparent")
+        border.width: seg.selected ? 1 : 0
+        border.color: Theme.accentDim
 
         Behavior on color { ColorAnimation { duration: 120 } }
       }
@@ -47,8 +62,17 @@ Row {
         Text {
           anchors.verticalCenter: parent.verticalCenter
           textFormat: Text.PlainText
+          text: root.glyphFor(String(seg.modelData.id))
+          color: seg.selected ? Theme.accent : Theme.fg3
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.icon
+        }
+
+        Text {
+          anchors.verticalCenter: parent.verticalCenter
+          textFormat: Text.PlainText
           text: String(seg.modelData.label || "")
-          color: seg.selected ? root.foreground : Qt.darker(root.foreground, 1.5)
+          color: seg.selected ? Theme.fg0 : Theme.fg2
           font.family: root.fontFamily
           font.pixelSize: Style.font.subtitle
           font.bold: seg.selected
@@ -60,30 +84,21 @@ Row {
           width: badgeText.implicitWidth + Style.space(10)
           height: Style.space(17)
           radius: height / 2
-          color: Util.alpha(seg.accent, seg.selected ? 0.95 : 0.75)
+          color: seg.selected ? Theme.accent : Theme.bg3
+          border.width: 1
+          border.color: seg.selected ? Theme.accent : Theme.line
 
           Text {
             id: badgeText
             anchors.centerIn: parent
             textFormat: Text.PlainText
             text: String(seg.badge)
-            color: "#0d1016"
+            color: seg.selected ? Theme.bg0 : Theme.fg1
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
             font.bold: true
           }
         }
-      }
-
-      Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: Style.space(3)
-        radius: height / 2
-        color: seg.selected ? seg.accent : "transparent"
-
-        Behavior on color { ColorAnimation { duration: 140 } }
       }
 
       MouseArea {

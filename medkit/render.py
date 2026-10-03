@@ -7,17 +7,22 @@ import cairo
 from . import paths
 
 SIZE = 64
+ICON_VERSION = 2
+
+BG2 = (0.086, 0.094, 0.110)
+FG0 = (0.949, 0.957, 0.969)
+
 PALETTE: dict[str, tuple[float, float, float]] = {
-    "neutral": (0.36, 0.39, 0.45),
-    "green": (0.09, 0.64, 0.29),
-    "amber": (0.96, 0.62, 0.05),
-    "red": (0.86, 0.15, 0.15),
+    "neutral": (0.35, 0.38, 0.41),
+    "green": (0.76, 0.79, 0.83),
+    "amber": (0.95, 0.96, 0.97),
+    "red": (0.55, 0.57, 0.61),
 }
-BADGE_COLOR = (0.86, 0.13, 0.13)
+BADGE_COLOR = (0.90, 0.91, 0.93)
 
 
 def icon_name(color: str, badge: int = 0) -> str:
-    return f"medkit-{_safe_color(color)}{_suffix(badge)}"
+    return f"medkit-{_safe_color(color)}{_suffix(badge)}-v{ICON_VERSION}"
 
 
 def icon_file(color: str, badge: int = 0) -> Path:
@@ -48,18 +53,18 @@ def _pill_path(context: cairo.Context, half_w: float, half_h: float, drop: float
 
 def _badge(context: cairo.Context, badge: int) -> None:
     cx, cy, radius = SIZE - 13, SIZE - 13, 12
-    context.set_source_rgb(*BADGE_COLOR)
+    context.set_source_rgb(*BG2)
     context.arc(cx, cy, radius, 0, 6.2832)
     context.fill()
     context.set_line_width(2)
-    context.set_source_rgb(1.0, 1.0, 1.0)
+    context.set_source_rgb(*FG0)
     context.arc(cx, cy, radius, 0, 6.2832)
     context.stroke()
     text = str(badge)
     context.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
     context.set_font_size(13)
     extents = context.text_extents(text)
-    context.set_source_rgb(1.0, 1.0, 1.0)
+    context.set_source_rgb(*FG0)
     context.move_to(
         cx - extents.width / 2 - extents.x_bearing,
         cy - extents.height / 2 - extents.y_bearing,
@@ -77,41 +82,13 @@ def _render(path: Path, color: str, badge: int) -> None:
     context.save()
     context.translate(SIZE / 2, SIZE / 2)
     context.rotate(-0.7854)
-
-    context.set_source_rgba(0.02, 0.03, 0.05, 0.35)
-    _pill_path(context, half_w, half_h, SIZE * 0.06)
-    context.fill()
-
-    context.set_source_rgb(*PALETTE[color])
+    context.set_source_rgb(*FG0)
     _pill_path(context, half_w, half_h)
-    context.fill()
-
-    context.save()
-    _pill_path(context, half_w, half_h)
-    context.clip()
-    context.set_source_rgb(0.97, 0.98, 1.0)
-    context.rectangle(0, -half_h, half_w, half_h * 2)
-    context.fill()
-    context.restore()
-
-    context.set_source_rgba(0.04, 0.06, 0.10, 0.22)
-    context.set_line_width(1.5)
-    context.move_to(0, -half_h + 5)
-    context.line_to(0, half_h - 5)
-    context.stroke()
-
-    context.save()
-    context.translate(-half_w * 0.44, -half_h * 0.40)
-    context.scale(1.0, 0.38)
-    context.set_source_rgba(1.0, 1.0, 1.0, 0.55)
-    context.arc(0, 0, half_h * 0.55, 0, 6.2832)
-    context.fill()
-    context.restore()
-
-    context.set_source_rgba(0.03, 0.05, 0.08, 0.55)
-    context.set_line_width(2)
-    _pill_path(context, half_w, half_h)
-    context.stroke()
+    if color == "green":
+        context.fill()
+    else:
+        context.set_line_width(2)
+        context.stroke()
     context.restore()
 
     if badge:

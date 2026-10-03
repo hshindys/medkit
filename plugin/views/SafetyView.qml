@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Commons
 import qs.Ui
+import ".."
 
 Column {
   id: root
@@ -20,16 +21,18 @@ Column {
   readonly property var missedData: health.missed || ({})
 
   function severityColor(severity) {
-    if (severity === "severe") return "#ef4444"
-    if (severity === "moderate") return "#f59e0b"
-    return "#38bdf8"
+    if (severity === "severe") return Theme.danger
+    if (severity === "moderate") return Theme.accentDim
+    return Theme.mild
   }
 
   Block {
     width: parent.width
     title: "DRUG INTERACTIONS"
+    glyph: Theme.glyphSafety
     meta: String(interactions.count || 0) + " FOUND · " + String(interactions.worst || "none").toUpperCase()
-    tint: Number(interactions.count || 0) > 0 ? severityColor(String(interactions.worst || "mild")) : "#22c55e"
+    tint: Number(interactions.count || 0) > 0 ? severityColor(String(interactions.worst || "mild")) : Theme.stateOk
+    heavy: String(interactions.worst || "") === "severe"
 
     Text {
       width: parent.width
@@ -124,8 +127,9 @@ Column {
   Block {
     width: parent.width
     title: "FOOD AND MEAL TIMING"
+    glyph: Theme.glyphPill
     meta: String((foodData.medicines || []).length) + " MEDICINES"
-    tint: "#f59e0b"
+    tint: Theme.accentDim
 
     Text {
       width: parent.width
@@ -163,7 +167,7 @@ Column {
           wrapMode: Text.WordWrap
           textFormat: Text.PlainText
           text: "when · " + String(foodRow.modelData.timing || "")
-          color: "#22c55e"
+          color: Theme.stateOk
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
         }
@@ -193,8 +197,9 @@ Column {
     width: parent.width
     visible: pregnancyData.active === true && (pregnancyData.findings || []).length > 0
     title: "PREGNANCY · " + String(pregnancyData.statusLabel || "").toUpperCase()
+    glyph: Theme.glyphHealth
     meta: String(pregnancyData.countFlagged || 0) + " TO AVOID"
-    tint: Number(pregnancyData.countFlagged || 0) > 0 ? "#ef4444" : "#38bdf8"
+    tint: Number(pregnancyData.countFlagged || 0) > 0 ? Theme.danger : Theme.mild
 
     Repeater {
       model: pregnancyData.findings || []
@@ -213,7 +218,7 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.PlainText
             text: "[" + String(finding2.modelData.riskLabel || "").toUpperCase() + "]"
-            color: String(finding2.modelData.riskColor || "#f59e0b")
+            color: String(finding2.modelData.riskColor || Theme.accentDim)
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
             font.bold: true
@@ -248,7 +253,7 @@ Column {
           wrapMode: Text.WordWrap
           textFormat: Text.PlainText
           text: "Safer: " + String(finding2.modelData.alternative || "")
-          color: "#22c55e"
+          color: Theme.stateOk
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           font.bold: true
@@ -271,8 +276,9 @@ Column {
   Block {
     width: parent.width
     title: "MISSED DOSE PROTOCOL"
+    glyph: Theme.glyphWarn
     meta: Number(missedData.count || 0) + " MISSED TODAY"
-    tint: Number(missedData.count || 0) > 0 ? "#ef4444" : "#64748b"
+    tint: Number(missedData.count || 0) > 0 ? Theme.danger : Theme.fg3
 
     Repeater {
       model: missedData.missed || []
@@ -285,7 +291,7 @@ Column {
         text: "✗ " + String(missedText.modelData.clock || "")
           + " " + String(missedText.modelData.name || "")
           + " — " + String(missedText.modelData.minutesLate || 0) + " min late"
-        color: "#ef4444"
+        color: Theme.danger
         font.family: root.fontFamily
         font.pixelSize: Style.font.body
         font.bold: true

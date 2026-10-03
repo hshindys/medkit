@@ -1,28 +1,34 @@
 import QtQuick
 import qs.Commons
 import qs.Ui
+import ".."
 
 BorderSurface {
   id: root
 
   property string title: ""
   property string meta: ""
-  property color tint: Color.accent
+  // One glyph family, one size, before the label. Marks what the block is.
+  property string glyph: ""
+  property color tint: Theme.accentDim
   property color foreground: Color.foreground
   property string fontFamily: Style.font.family
   property real fontSize: Style.font.caption
+  // Heavier border = the block is trying to stop you. Bright, not red.
+  property bool heavy: false
 
   default property alias rows: body.data
 
-  readonly property color dim: Qt.darker(root.foreground, 1.5)
+  readonly property color dim: Theme.fg2
 
   width: parent ? parent.width : implicitWidth
   implicitHeight: body.implicitHeight + root.contentTopInset + root.contentBottomInset
   height: implicitHeight
   radius: Style.cornerRadius
   padding: Style.space(16)
-  color: Util.alpha(root.tint, 0.07)
-  borderSpec: Border.flat(Util.alpha(root.tint, 0.45), Math.max(1, Style.normalBorderWidth))
+  color: Theme.bg2
+  borderSpec: Border.flat(root.heavy ? Theme.alpha(root.tint, 0.65) : Theme.line,
+    Math.max(1, root.heavy ? 2 : Style.normalBorderWidth))
 
   Column {
     id: body
@@ -39,7 +45,17 @@ BorderSurface {
       Row {
         id: head
         width: parent.width
-        spacing: Style.space(8)
+        spacing: Style.space(7)
+
+        Text {
+          visible: root.glyph !== ""
+          textFormat: Text.PlainText
+          text: root.glyph
+          color: root.tint
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.icon
+          verticalAlignment: Text.AlignVCenter
+        }
 
         Text {
           id: titleText

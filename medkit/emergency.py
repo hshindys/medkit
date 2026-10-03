@@ -187,7 +187,7 @@ def emergency_numbers() -> list[dict]:
                 "name": data["emergency_contact"].get("name", ""),
                 "phone": data["emergency_contact"].get("phone", ""),
                 "uri": call_uri(data["emergency_contact"].get("phone", "")),
-                "tint": "#ef4444",
+                "tint": "#f2f4f7",
             }
         )
     if data.get("doctor", {}).get("phone"):
@@ -197,7 +197,7 @@ def emergency_numbers() -> list[dict]:
                 "name": data["doctor"].get("name", ""),
                 "phone": data["doctor"].get("phone", ""),
                 "uri": call_uri(data["doctor"].get("phone", "")),
-                "tint": "#f59e0b",
+                "tint": "#9aa0a8",
             }
         )
     if data.get("pharmacy", {}).get("phone"):
@@ -207,7 +207,7 @@ def emergency_numbers() -> list[dict]:
                 "name": data["pharmacy"].get("name", ""),
                 "phone": data["pharmacy"].get("phone", ""),
                 "uri": call_uri(data["pharmacy"].get("phone", "")),
-                "tint": "#38bdf8",
+                "tint": "#8b919b",
             }
         )
     rows.append(
@@ -216,7 +216,7 @@ def emergency_numbers() -> list[dict]:
             "name": "Ambulance",
             "phone": "123",
             "uri": "tel:123",
-            "tint": "#ef4444",
+            "tint": "#f2f4f7",
         }
     )
     return rows

@@ -6,14 +6,14 @@ from . import actions, art, engine, tick
 from .engine import COLOR_LABELS, TAB_LABELS, TABS, Dose
 from .notify import Notice, Notifier
 
-# Tab accents. Four hues that stay readable on the panel background and stay
-# apart from each other, so a glance at the tab row says which window of the
-# day you are looking at before you read a single label.
+# Tab accents. Four grays from the shared ramp that stay readable on the panel
+# background and stay apart from each other, so a glance at the tab row says
+# which window of the day you are looking at before you read a single label.
 TAB_COLORS = {
-    "morning": "#f59e0b",
-    "evening": "#38bdf8",
-    "night": "#a78bfa",
-    "emergency": "#ef4444",
+    "morning": "#c3c8d0",
+    "evening": "#8b919b",
+    "night": "#5a6068",
+    "emergency": "#f2f4f7",
 }
 
 # One glyph per window of the day, and a pill for the as-needed shelf. The
@@ -27,10 +27,10 @@ TAB_ICONS = {
 }
 
 STATE_COLORS = {
-    "taken": "#22c55e",
-    "due": "#f59e0b",
-    "overdue": "#ef4444",
-    "pending": "#64748b",
+    "taken": "#c3c8d0",
+    "due": "#f2f4f7",
+    "overdue": "#8b919b",
+    "pending": "#5a6068",
 }
 
 STATE_LABELS = {
@@ -191,7 +191,7 @@ def payload(now: datetime | None = None) -> dict:
             "refillAt": dose.medicine.refill_at,
             "low": dose.medicine.is_low(),
             "out": dose.medicine.is_out(),
-            "tabColor": TAB_COLORS.get(tab, "#64748b"),
+            "tabColor": TAB_COLORS.get(tab, "#8b919b"),
         }
         entry.update(_pill(dose.medicine.name))
         doses.append(entry)
@@ -216,7 +216,7 @@ def payload(now: datetime | None = None) -> dict:
             "notes": medicine.notes,
             "active": medicine.active,
             "tab": tab,
-            "tabColor": TAB_COLORS.get(tab, "#64748b"),
+            "tabColor": TAB_COLORS.get(tab, "#8b919b"),
         }
         item.update(_pill(medicine.name))
         medicines.append(item)

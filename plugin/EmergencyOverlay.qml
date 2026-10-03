@@ -15,7 +15,7 @@ PanelWindow {
   property string fontFamily: Style.font.family
 
   readonly property var card: health.emergency || ({})
-  readonly property color dim: Qt.darker(root.foreground, 1.4)
+  readonly property color dim: Theme.fg2
 
   visible: root.opened
   anchors { top: true; bottom: true; left: true; right: true }
@@ -37,7 +37,7 @@ PanelWindow {
 
   Rectangle {
     anchors.fill: parent
-    color: Color.menu.scrim
+    color: Theme.alpha(Theme.bg0, Theme.scrimOpacity)
   }
 
   MouseArea {
@@ -52,8 +52,15 @@ PanelWindow {
     width: Math.min(Style.space(860), parent.width - Style.space(24) * 2)
     height: Math.min(parent.height - Style.space(48), content.implicitHeight + Style.space(36) * 2)
     radius: Style.cornerRadius
-    color: Color.menu.background
-    borderSpec: Border.surfaceSpec("menu", "border", Color.menu.border, Math.max(1, Style.space(2)))
+    color: Theme.bg2
+    borderSpec: Border.flat(Theme.alpha(Theme.fg2, 0.7), Math.max(2, Style.space(2)))
+    opacity: root.opened ? 1 : 0
+    transform: Translate {
+      id: surfaceShift
+      y: root.opened ? 0 : Style.space(8)
+      Behavior on y { NumberAnimation { duration: Theme.fadePanel; easing.type: Easing.OutCubic } }
+    }
+    Behavior on opacity { NumberAnimation { duration: Theme.fadePanel; easing.type: Easing.OutCubic } }
 
     MouseArea { anchors.fill: parent; onClicked: {} }
 

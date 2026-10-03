@@ -214,14 +214,21 @@ o.bind("SUPER + SHIFT + N", "MedKit status", "alacritty -e ~/medkit/bin/medkit -
 
 ## Bar widget (Omarchy plugin)
 
-`plugin/` holds a Quickshell bar widget — status dot, next dose time, daily
-progress and low-stock warnings; click toggles a panel with a segmented
+`plugin/` holds a Quickshell bar widget — a monochrome status mark, next
+dose time, daily progress and low-stock warnings; click toggles a panel with a
+segmented
 switcher: **doses** (Take / Skip / Edit / Delete rows), **safety**
 (interactions, food, pregnancy, missed dose), **health** (adherence, vitals
 correlation, side effects, refills) and **reports** (therapy review + weekly /
 monthly reports) — plus a **card** view with the emergency card, which also
 opens fullscreen on `c` (`SUPER+CTRL+11` opens the panel, `5`–`8` jump
-straight to a view). Each row's **Edit** opens the
+straight to a view, `j`/`k` move, `Enter` take, `s` skip, `e` edit, `d`
+delete, `?` lists every key). The whole widget is **monochrome** — one dark
+ramp, state by luminance and a Nerd Font glyph instead of colour, danger as
+the brightest text with a heavier border, and short, meaningful motion (panel
+fade + lift, view cross-fade, take flash, due pulse, low-stock breath). The
+palette, glyph pack and timings live in `plugin/Theme.qml`. Each row's
+**Edit** opens the
 dashboard straight on that medicine's form (time, dose, and course days for
 emergencies) and **Delete** opens the dashboard on its delete confirmation. It
 is published as its own repository:

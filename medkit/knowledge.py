@@ -14,9 +14,9 @@ SEVERITIES = ("mild", "moderate", "severe")
 SEVERITY_RANK = {name: index for index, name in enumerate(SEVERITIES)}
 
 SEVERITY_COLORS = {
-    "mild": "#38bdf8",
-    "moderate": "#f59e0b",
-    "severe": "#ef4444",
+    "mild": "#8b919b",
+    "moderate": "#9aa0a8",
+    "severe": "#f2f4f7",
 }
 
 # Dose and form words that carry no identity: "Concor 5 mg" and "Concor" are

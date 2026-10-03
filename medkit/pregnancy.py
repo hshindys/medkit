@@ -9,10 +9,10 @@ RISK_ORDER = ("usually acceptable", "caution", "avoid", "contraindicated")
 RISK_RANK = {risk: index for index, risk in enumerate(RISK_ORDER)}
 
 RISK_COLORS = {
-    "usually acceptable": "#22c55e",
-    "caution": "#f59e0b",
-    "avoid": "#f97316",
-    "contraindicated": "#ef4444",
+    "usually acceptable": "#c3c8d0",
+    "caution": "#9aa0a8",
+    "avoid": "#9aa0a8",
+    "contraindicated": "#f2f4f7",
 }
 
 STATUS_LABELS = {

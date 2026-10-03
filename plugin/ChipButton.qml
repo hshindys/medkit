@@ -2,17 +2,18 @@ import QtQuick
 import qs.Commons
 import qs.Ui
 
-// A small tinted pill button: the tint is the caller's colour (a medicine's
-// own hue, a tab's accent), so every action row reads as its own card rather
-// than one grey control repeated down the panel.
+// A monochrome chip: outlined on `line`, filled only when it is the primary
+// action of its row. State lives in the label's luminance, never in hue, so
+// a row of buttons still reads as one system on a dark surface.
 BorderSurface {
   id: root
 
   property string text: ""
-  property color tint: Color.accent
+  property color tint: Theme.accent
   property color foreground: Color.foreground
   property bool clickable: true
   property bool filled: false
+  property string tooltip: ""
   property string fontFamily: Style.font.family
   property real fontSize: Style.font.caption
 
@@ -25,14 +26,18 @@ BorderSurface {
   radius: Style.cornerRadius
 
   color: !clickable
-    ? Util.alpha(tint, 0.06)
+    ? Theme.bg2
     : mouse.pressed
-      ? Util.alpha(tint, filled ? 0.60 : 0.38)
-      : hot
-        ? Util.alpha(tint, filled ? 0.48 : 0.30)
-        : Util.alpha(tint, filled ? 0.34 : 0.15)
+      ? (root.filled ? Theme.accentDim : Theme.bg3)
+      : root.filled
+        ? (root.hot ? Theme.accentDim : Theme.accent)
+        : (root.hot ? Theme.bg3 : Theme.alpha(Theme.bg2, 0.55))
   borderSpec: Border.flat(
-    clickable ? (hot ? tint : Util.alpha(tint, 0.55)) : Util.alpha(tint, 0.25),
+    root.filled
+      ? Theme.accent
+      : root.clickable
+        ? (root.hot ? Theme.accentDim : Theme.line)
+        : Theme.alpha(root.tint, 0.55),
     Math.max(1, Style.normalBorderWidth)
   )
 
@@ -44,8 +49,10 @@ BorderSurface {
     textFormat: Text.PlainText
     text: root.text
     color: root.filled
-      ? "#ffffff"
-      : (root.clickable ? root.foreground : Qt.darker(root.foreground, 1.9))
+      ? Theme.bg0
+      : root.clickable
+        ? Theme.fg1
+        : root.tint
     font.family: root.fontFamily
     font.pixelSize: root.fontSize
     font.bold: true
@@ -58,5 +65,14 @@ BorderSurface {
     enabled: root.clickable
     cursorShape: Qt.PointingHandCursor
     onClicked: root.clicked()
+  }
+
+  PanelToolTip {
+    visible: root.tooltip !== "" && mouse.containsMouse
+    text: root.tooltip
+    panelForeground: Theme.fg1
+    panelBackground: Theme.bg3
+    panelBorder: Theme.line
+    fontFamily: root.fontFamily
   }
 }
