@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "hshindys.medkit",
   "name": "MedKit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "author": "hshindys",
   "description": "Medication status in the bar: a pill mark, next dose time, daily progress and low-stock warnings. Click to open the panel (doses, safety, health, reports, cards) with an offline emergency card overlay; right-click opens the MedKit dashboard.",
   "kinds": [
