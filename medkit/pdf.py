@@ -11,6 +11,8 @@ required, and neither is a network connection.
 
 from pathlib import Path
 
+from . import arabic, ttf
+
 # A4 in PostScript points.
 PAGE_WIDTH = 595
 PAGE_HEIGHT = 842
@@ -18,6 +20,11 @@ MARGIN = 54
 
 FONT_REGULAR = "F1"
 FONT_BOLD = "F2"
+# Embedded faces, used for any string Arabic shaping turns into presentation
+# forms. Helvetica is still the base-14 font for everything else, so a Latin
+# report stays a two-kilobyte file.
+EMBED_REGULAR = "F3"
+EMBED_BOLD = "F4"
 
 _COLORS = {
     "black": (0, 0, 0),
@@ -37,9 +44,12 @@ def _escape(text: str) -> str:
             out.append("\\" + char)
             continue
         try:
-            char.encode("cp1252")
-            out.append(char)
-        except UnicodeEncodeError:
+            # Text is drawn in WinAnsi (cp1252) but the stream is written as
+            # latin-1, so hand back the byte as a latin-1 character: "•"
+            # becomes chr(0x95) instead of surviving as U+2022 and turning
+            # into a "?" on the way out of save().
+            out.append(char.encode("cp1252").decode("latin-1"))
+        except (UnicodeEncodeError, UnicodeDecodeError):
             out.append("?")
     return "".join(out)
 
@@ -51,6 +61,8 @@ class PDF:
         self.pages: list[list[str]] = []
         self._ops: list[str] = []
         self._y = PAGE_HEIGHT - MARGIN
+        self._used_faces: set[str] = set()
+        self._used_glyphs: dict[str, set[int]] = {}
         self.new_page()
 
     # ---- drawing ------------------------------------------------------
@@ -77,11 +89,46 @@ class PDF:
         color: str = "black",
     ) -> None:
         r, g, b = _COLORS.get(color, _COLORS["black"])
+        value = str(value)
+        if arabic.has_arabic(value) and self._draw_embedded(
+            x, y, value, size, bold, (r, g, b)
+        ):
+            return
         font = FONT_BOLD if bold else FONT_REGULAR
         self._ops.append(
             f"BT /{font} {size:g} Tf {r:g} {g:g} {b:g} rg "
             f"{x:g} {y:g} Td ({_escape(value)}) Tj ET"
         )
+
+    def _draw_embedded(
+        self,
+        x: float,
+        y: float,
+        value: str,
+        size: float,
+        bold: bool,
+        rgb: tuple[float, float, float],
+    ) -> bool:
+        """Lay Arabic out for an embedded face; False keeps the base-14 path."""
+        face = "bold" if bold else "regular"
+        try:
+            font = ttf.bold_font() if bold else ttf.regular_font()
+        except ttf.FontError:
+            return False
+        visual = arabic.visual(value)
+        glyphs = [font.glyph(char) for char in visual]
+        if not glyphs or not all(glyphs):
+            return False
+        self._used_faces.add(face)
+        self._used_glyphs.setdefault(face, set()).update(glyphs)
+        r, g, b = rgb
+        code = EMBED_BOLD if bold else EMBED_REGULAR
+        payload = "".join(f"{glyph:04X}" for glyph in glyphs)
+        self._ops.append(
+            f"BT /{code} {size:g} Tf {r:g} {g:g} {b:g} rg "
+            f"{x:g} {y:g} Td <{payload}> Tj ET"
+        )
+        return True
 
     def line(self, x1: float, y1: float, x2: float, y2: float, color: str = "light", width: float = 0.8) -> None:
         r, g, b = _COLORS.get(color, _COLORS["light"])
@@ -150,6 +197,10 @@ class PDF:
             objects.append(body.encode("latin-1", "replace"))
             return len(objects)
 
+        def add_raw(body: bytes) -> int:
+            objects.append(body)
+            return len(objects)
+
         font_regular = add(
             "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica "
             "/Encoding /WinAnsiEncoding >>"
@@ -157,6 +208,15 @@ class PDF:
         font_bold = add(
             "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold "
             "/Encoding /WinAnsiEncoding >>"
+        )
+
+        embedded: dict[str, int] = {}
+        for face in sorted(self._used_faces):
+            font = ttf.bold_font() if face == "bold" else ttf.regular_font()
+            embedded[face] = self._embed_font(objects, add_raw, face, font)
+        face_resources = "".join(
+            f"/{EMBED_BOLD if face == 'bold' else EMBED_REGULAR} {reference} 0 R "
+            for face, reference in embedded.items()
         )
 
         page_ids: list[int] = []
@@ -176,7 +236,7 @@ class PDF:
                 "<< /Type /Page /Parent 0 0 R "
                 f"/MediaBox [0 0 {PAGE_WIDTH} {PAGE_HEIGHT}] "
                 f"/Resources << /Font << /{FONT_REGULAR} {font_regular} 0 R "
-                f"/{FONT_BOLD} {font_bold} 0 R >> >> "
+                f"/{FONT_BOLD} {font_bold} 0 R {face_resources}>> >> "
                 f"/Contents {content_id} 0 R >>"
             )
             objects.append(body.encode("latin-1"))
@@ -214,6 +274,53 @@ class PDF:
 
         target.write_bytes(bytes(out))
         return target
+
+    def _embed_font(self, objects: list[bytes], add_raw, face: str, font: ttf.TrueTypeFont) -> int:
+        """FontFile2 + descriptor + CIDFont + Type0, returning the Type0 id."""
+        name = "DejaVuSans-Bold" if face == "bold" else "DejaVuSans"
+        data = font.data
+        file_id = add_raw(
+            f"<< /Length {len(data)} /Length1 {len(data)} >>\nstream\n".encode("latin-1")
+            + data
+            + b"\nendstream"
+        )
+
+        upem = font.units_per_em
+
+        def to_text_space(units: int) -> int:
+            return round(units * 1000 / upem)
+
+        x_min, y_min, x_max, y_max = font.bbox
+        descriptor_id = add_raw(
+            (
+                f"<< /Type /FontDescriptor /FontName /{name} /Flags 32 "
+                f"/FontBBox [{to_text_space(x_min)} {to_text_space(y_min)} "
+                f"{to_text_space(x_max)} {to_text_space(y_max)}] "
+                f"/ItalicAngle 0 /Ascent {to_text_space(font.ascent)} "
+                f"/Descent {to_text_space(font.descent)} "
+                f"/CapHeight {to_text_space(font.cap_height)} /StemV 80 "
+                f"/FontFile2 {file_id} 0 R >>"
+            ).encode("latin-1")
+        )
+
+        used = sorted(self._used_glyphs.get(face, set()) | {0})
+        widths = " ".join(
+            f"{glyph} [{font.glyph_width(glyph)}]" for glyph in used
+        )
+        descendant_id = add_raw(
+            (
+                f"<< /Type /Font /Subtype /CIDFontType2 /BaseFont /{name} "
+                f"/CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) "
+                f"/Supplement 0 >> /FontDescriptor {descriptor_id} 0 R "
+                f"/DW 600 /W [{widths}] /CIDToGIDMap /Identity >>"
+            ).encode("latin-1")
+        )
+        return add_raw(
+            (
+                f"<< /Type /Font /Subtype /Type0 /BaseFont /{name} "
+                f"/Encoding /Identity-H /DescendantFonts [{descendant_id} 0 R] >>"
+            ).encode("latin-1")
+        )
 
 
 def write_text_pdf(path: str | Path, title: str, lines: list[str]) -> Path:
