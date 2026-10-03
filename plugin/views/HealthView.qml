@@ -173,7 +173,7 @@ Column {
       color: adherence.weekly && adherence.weekly.below ? Theme.danger : root.dim
       font.family: root.fontFamily
       font.pixelSize: Style.font.body
-      font.bold: adherence.weekly && adherence.weekly.below
+      font.bold: !!(adherence.weekly && adherence.weekly.below)
     }
   }
 
