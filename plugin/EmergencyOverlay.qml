@@ -97,8 +97,8 @@ PanelWindow {
 
             iconComponent: Component {
               Text {
-                text: ""
-                color: Color.accent
+                text: Theme.glyphEmergency
+                color: Theme.accent
                 font.family: root.fontFamily
                 font.pixelSize: Style.font.display
               }

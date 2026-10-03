@@ -1,14 +1,15 @@
 import QtQuick
 import qs.Commons
 
-// A medicine's own pill, animated and in its own colour. Falls back to a
+// A medicine's own pill, animated in one of the twelve greys of the ramp.
+// Falls back to a
 // this glyph when the GIF cannot be read (or is still being generated),
 // so a card is never blank.
 Item {
   id: root
 
   property string path: ""
-  property color tint: Color.accent
+  property color tint: Theme.accent
   property real size: Style.space(34)
   property string fontFamily: Style.font.family
   // Shown when the medicine's own artwork is missing: the pill by default,
