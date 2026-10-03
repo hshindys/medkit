@@ -34,7 +34,22 @@ def _dose_body(dose: Dose) -> str:
         parts.append(dose.medicine.dose)
     if dose.medicine.notes:
         parts.append(dose.medicine.notes)
+    hint = _food_hint(dose.medicine)
+    if hint:
+        parts.append(hint)
     return " · ".join(parts)
+
+
+def _food_hint(medicine) -> str:
+    """The one line about eating around this tablet, when it is short enough
+    to sit inside a notification without pushing the buttons off screen."""
+    try:
+        from . import food
+
+        timing = food.tips_for(medicine)["timing"]
+    except Exception:  # a missing knowledge file must never block a reminder
+        return ""
+    return timing if 0 < len(timing) <= 80 else ""
 
 
 def build_notices(status: DayStatus, now: datetime) -> list[Notice]:
@@ -122,6 +137,198 @@ def build_notices(status: DayStatus, now: datetime) -> list[Notice]:
     return notices
 
 
+def build_health_notices(
+    document, history, now: datetime
+) -> list[Notice]:
+    """Everything the safety net says that is not "your dose is due".
+
+    Each kind is keyed so a 60-second timer cannot turn one problem into a
+    hundred notifications; the state file prunes keys after 30 days, which is
+    also the right rhythm for re-surfacing a standing interaction.
+    """
+    from . import (
+        adherence,
+        food,
+        interactions,
+        missed,
+        pregnancy,
+        refill,
+        review,
+        sideeffects,
+    )
+
+    if not document.wizard_done:
+        return []
+    medicines = document.medicines
+    active = [m for m in medicines if m.active]
+    notices: list[Notice] = []
+
+    # 1 — drug–drug interactions, NSAID against blood-pressure tablets first.
+    findings = interactions.check(active)
+    for finding in findings:
+        if finding.severity == "mild":
+            continue  # shown in the panel, not worth interrupting for
+        notices.append(
+            Notice(
+                key=f"int|{finding.a}|{finding.b}",
+                kind="interaction",
+                medicine=finding.a,
+                summary=f"INTERACTION [{finding.severity.upper()}]: {finding.a} + {finding.b}",
+                body=f"{finding.effect}\n\n{finding.advice}\n\nThis is not medical advice.",
+                urgency="critical" if finding.severity == "severe" else "normal",
+                icon="dialog-warning",
+            )
+        )
+
+    # 2 — food that fights a medicine (grapefruit, vitamin K, dairy...) and the
+    # meal timing that must not be skipped (sulfonylurea + meal).
+    for row in food.alerts(active):
+        if row["severity"] != "severe":
+            continue  # moderate food advice waits in the panel
+        is_timing = row.get("relation") == "with"
+        notices.append(
+            Notice(
+                key=f"fud|{row['medicine']}|{row.get('label', row['tip'])[:40]}",
+                kind="food",
+                medicine=row["medicine"],
+                summary=(
+                    f"TAKE WITH FOOD: {row['medicine']}"
+                    if is_timing
+                    else f"FOOD WARNING: {row['medicine']}"
+                ),
+                body=f"{row.get('label', '')} — {row['tip']}\n\nThis is not medical advice.",
+                urgency="critical" if is_timing else "normal",
+                icon="dialog-information",
+            )
+        )
+
+    # 3 — adherence under the target, judged on yesterday.
+    adherence_state = adherence.alert_state(active, history, now)
+    if adherence_state["firing"]:
+        notices.append(
+            Notice(
+                key=f"adx|{adherence_state['date']}",
+                kind="adherence",
+                summary=f"ADHERENCE {adherence_state['label']} — below target",
+                body=(
+                    f"Yesterday {adherence_state['label']} of doses were taken "
+                    f"(target {adherence_state['threshold']}%). Take the next dose on time "
+                    "to start rebuilding the streak."
+                ),
+                urgency="normal",
+                icon="appointment-soon",
+            )
+        )
+
+    # 4 — running out, three days ahead of the box emptying.
+    refills = refill.check(active, now)
+    week = now.isocalendar()[:2]
+    for row in refills["warnings"] + refills["out"]:
+        if row["out"]:
+            body = "Zero pills left. Refill now."
+        else:
+            body = (
+                f"{row['stock']} pills left — about {row['daysLeft']} day(s) at "
+                f"{row['perDay']}/day. Runs out {row['runOut']}."
+            )
+        phone = row.get("pharmacyPhone") or ""
+        if phone:
+            body += f"\nPharmacy: {row['pharmacyName'] or 'call'} {phone}"
+        notices.append(
+            Notice(
+                key=f"rfl|{row['name']}|{week[0]}-{week[1]}",
+                kind="refill",
+                medicine=row["name"],
+                summary=(
+                    f"OUT OF STOCK: {row['name']}"
+                    if row["out"]
+                    else f"REFILL SOON: {row['name']} ({row['daysLeft']} days left)"
+                ),
+                body=body,
+                urgency="critical" if row["out"] else "normal",
+                icon=pill_icon(row["name"]),
+            )
+        )
+
+    # 5 — a day that has slipped, not a single dose.
+    missed_state = missed.summary(active, now, history)
+    if missed_state["alert"]:
+        names = ", ".join(item["name"] for item in missed_state["missed"][:4])
+        notices.append(
+            Notice(
+                key=f"msd|{now.date().isoformat()}",
+                kind="missed",
+                summary=f"{missed_state['count']} DOSES MISSED TODAY",
+                body=(
+                    f"{names}.\n\n"
+                    + (missed_state["forMissed"][0]["text"] if missed_state["forMissed"] else "")
+                    + "\n\nThis is not medical advice."
+                ),
+                urgency="critical",
+                icon="dialog-warning",
+            )
+        )
+
+    # 6 — the same side effect, reported for the third time.
+    for repeat in sideeffects.repeat_alerts():
+        notices.append(
+            Notice(
+                key=f"sef|{repeat['medicine']}|{repeat['effectKey']}",
+                kind="sideeffect",
+                medicine=repeat["medicine"],
+                summary=f"REPEATED SIDE EFFECT: {repeat['effect']}",
+                body=(
+                    f"{repeat['medicine']} ({repeat['dose'] or 'dose not recorded'}) — "
+                    f"reported {repeat['count']} times, first {repeat['first']}, "
+                    f"worst {repeat['worst']}.\n\n"
+                    "Report this to your doctor or pharmacist at the next visit.\n"
+                    "This is not medical advice."
+                ),
+                urgency="critical" if repeat["worst"] == "severe" else "normal",
+                icon="dialog-warning",
+            )
+        )
+
+    # 7 — the quarterly therapy review.
+    state = review.status(now)
+    if state["due"]:
+        when = state["nextLabel"] if state["next"] else "now"
+        notices.append(
+            Notice(
+                key=f"rvw|{when}",
+                kind="review",
+                summary="MEDICATION REVIEW DUE",
+                body=(
+                    f"Every {state['intervalMonths']} months: review every medicine, dose and "
+                    "duplicate with your doctor. Export the PDF from the MedKit panel "
+                    "(Reports → Export PDF).\n\nThis is not medical advice."
+                ),
+                urgency="normal",
+                icon="x-office-calendar",
+            )
+        )
+
+    # 8 — a medicine that should not be taken right now.
+    pregnancy_state = pregnancy.check(active)
+    for finding in pregnancy_state["flagged"]:
+        notices.append(
+            Notice(
+                key=f"prg|{finding['name']}",
+                kind="pregnancy",
+                medicine=finding["name"],
+                summary=f"{finding['risk'].upper()}: {finding['name']} in pregnancy",
+                body=(
+                    f"{finding['note']}\n\nSafer option: {finding['alternative']}\n\n"
+                    f"{pregnancy_state['consult']}\nThis is not medical advice."
+                ),
+                urgency="critical" if finding["risk"] == "contraindicated" else "normal",
+                icon="dialog-error",
+            )
+        )
+
+    return notices
+
+
 def build_tab_notices(status: DayStatus, now: datetime, tab: str) -> list[Notice]:
     """One notice for the doses in a panel tab that are due or overdue now.
 
@@ -177,6 +384,12 @@ def run_tick(dispatch: bool = True, now: datetime | None = None) -> TickReport:
         report.fired.append(notice)
         if notice.kind == "restock":
             append_history("restock", notice.medicine, moment)
+        report.lines.append(f"notified[{notice.urgency}] {notice.summary}")
+
+    for notice in build_health_notices(document, history, moment):
+        if not notifier.fire(notice):
+            continue
+        report.fired.append(notice)
         report.lines.append(f"notified[{notice.urgency}] {notice.summary}")
 
     report.suppressed = notifier.suppressed

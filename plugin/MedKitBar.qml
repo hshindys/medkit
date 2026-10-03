@@ -25,6 +25,10 @@ BarWidget {
   // The whole payload from --plugin-panel: header, tabs, doses, medicines.
   property var panelData: ({})
   property bool loading: false
+  // Fullscreen medical card, one instance for this bar's monitor.
+  property bool emergencyOpen: false
+  // Last thing a CLI action printed, so "written: /path/…" is not a rumour.
+  property string actionMessage: ""
 
   // Convenience reads the bar label and tooltip are built from.
   readonly property string medkitState: String(panelData.color || "neutral")
@@ -35,6 +39,7 @@ BarWidget {
   readonly property int lowCount: Number(panelData.low || 0)
   readonly property int emergencyCount: Number(panelData.emergency || 0)
   readonly property bool wizardDone: panelData.wizard !== false
+  readonly property var health: panelData.health || ({})
 
   readonly property string stateColorHex: {
     var hex = { "green": "#22c55e", "amber": "#f59e0b", "red": "#ef4444" }[medkitState] || "#64748b"
@@ -115,6 +120,37 @@ BarWidget {
     notifyProc.running = true
   }
 
+  // ---- Emergency card (fullscreen, this monitor only) -----------------
+  function showEmergency() { root.emergencyOpen = true }
+  function hideEmergency() { root.emergencyOpen = false }
+  function toggleEmergency() { root.emergencyOpen = !root.emergencyOpen }
+
+  // ---- Actions the card, the safety views and the reports view need ----
+  function exportCard(format) {
+    actionProc.command = [root.medkitBin, "--emergency-export", format]
+    actionProc.running = true
+  }
+
+  function callTarget(label) {
+    actionProc.command = [root.medkitBin, "--emergency-call", label]
+    actionProc.running = true
+  }
+
+  function callPharmacy() {
+    actionProc.command = [root.medkitBin, "--call-pharmacy"]
+    actionProc.running = true
+  }
+
+  function reviewExport() {
+    actionProc.command = [root.medkitBin, "--review-export"]
+    actionProc.running = true
+  }
+
+  function reviewDone() {
+    actionProc.command = [root.medkitBin, "--review-done"]
+    actionProc.running = true
+  }
+
   function tipText() {
     if (!wizardDone) return "MedKit — setup needed, click to open the panel"
     var tip = "MedKit — "
@@ -143,6 +179,9 @@ BarWidget {
     function deleteMedicine(name: string): void { root.deleteMedicine(name) }
     function refill(): void { root.refill("") }
     function refillOne(name: string): void { root.refill(name) }
+    function medicalCard(): void { root.showEmergency() }
+    function closeCard(): void { root.hideEmergency() }
+    function card(): void { root.toggleEmergency() }
   }
 
   Process {
@@ -170,7 +209,29 @@ BarWidget {
 
   Process {
     id: actionProc
-    onExited: function(exitCode) { Qt.callLater(root.refresh) }
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        var line = String(text || "").trim()
+        if (line !== "") {
+          root.actionMessage = line
+          actionToast.restart()
+        }
+      }
+    }
+    onExited: function(exitCode) {
+      if (exitCode !== 0 && root.actionMessage === "") {
+        root.actionMessage = "action failed (" + exitCode + ")"
+        actionToast.restart()
+      }
+      Qt.callLater(root.refresh)
+    }
+  }
+
+  Timer {
+    id: actionToast
+    interval: 7000
+    onTriggered: root.actionMessage = ""
   }
 
   Process {
@@ -268,6 +329,32 @@ BarWidget {
     onLoaded: {
       root.injectPanel()
       Qt.callLater(root.injectPanel)
+    }
+  }
+
+  // The emergency card is a window of its own, created only while it is up
+  // so a bar on every monitor does not keep a fullscreen surface alive.
+  Loader {
+    id: emergencyLoader
+    active: root.emergencyOpen
+    source: Qt.resolvedUrl("EmergencyOverlay.qml")
+    onLoaded: {
+      if (!item) return
+      item.host = root
+      item.health = Qt.binding(function() { return root.panelData.health || ({}) })
+      item.foreground = Qt.binding(function() {
+        return root.bar ? root.bar.foreground : Color.foreground
+      })
+      item.fontFamily = Qt.binding(function() {
+        return root.bar ? root.bar.fontFamily : Style.font.family
+      })
+      item.open()
+    }
+    onStatusChanged: {
+      if (status === Loader.Error) {
+        root.emergencyOpen = false
+        console.warn("MedKit: emergency card failed to load:", errorString())
+      }
     }
   }
 

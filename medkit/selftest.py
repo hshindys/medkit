@@ -8,7 +8,7 @@ from pathlib import Path
 from . import actions, engine, paths, vault
 from .models import Medicine
 from .tick import build_notices, run_tick
-from .store import load_medicines, read_history
+from .store import load_medicines, read_history, save_medicines
 
 
 class Harness:
@@ -330,6 +330,227 @@ def run() -> int:
         and removed == "deleted Selftest discard"
         and "unknown medicine" in unknown_error,
         f"{removed} / error={unknown_error!r}",
+    )
+
+    # ---- safety, health records and reports --------------------------
+    from . import (
+        adherence as adherence_mod,
+        emergency as emergency_mod,
+        food as food_mod,
+        interactions as interactions_mod,
+        missed as missed_mod,
+        panel_data,
+        pregnancy as pregnancy_mod,
+        refill as refill_mod,
+        review as review_mod,
+        sideeffects as sideeffects_mod,
+        tick as tick_mod,
+        vitals as vitals_mod,
+    )
+    from .knowledge import load as load_knowledge
+
+    book = load_knowledge()
+    harness.check(
+        "knowledge snapshot carries its sources",
+        book.disclaimer.startswith("This is not medical advice")
+        and len(book.sources) >= 3
+        and book.updated,
+        f"{len(book.sources)} sources, updated {book.updated}",
+    )
+    resolved = book.resolve("Concor", "")
+    harness.check(
+        "brand name resolves to a generic ingredient",
+        resolved.generic == "bisoprolol",
+        f"Concor -> {resolved.generic!r}",
+    )
+
+    document = load_medicines()
+    document.by_name("Alpha 5 mg").generic = "amlodipine"
+    document.by_name("Beta 40 mg").generic = "ibuprofen"
+    document.by_name("Gamma 10 mg").generic = "warfarin"
+    save_medicines(document)
+    active = [medicine for medicine in document.medicines if medicine.active]
+
+    findings = interactions_mod.check(active)
+    nsaid_bp = [finding for finding in findings if finding.is_nsaid_bp]
+    harness.check(
+        "an NSAID against a blood-pressure tablet is flagged",
+        len(nsaid_bp) >= 1
+        and all(finding.effect and finding.advice for finding in findings),
+        ", ".join(f"{f.a}+{f.b}[{f.severity}]" for f in findings),
+    )
+    summary = interactions_mod.summarize(findings)
+    harness.check(
+        "interaction summary counts every severity bucket",
+        summary["total"] == len(findings) and summary["worst"] in ("mild", "moderate", "severe"),
+        f"{summary['total']} findings, worst {summary['worst']}",
+    )
+
+    tips = food_mod.tips_for(document.by_name("Beta 40 mg"))
+    food_rules = tips["rules"]
+    harness.check(
+        "meal timing is not phrased as an avoidance",
+        any(rule["relation"] == "with" and rule["label"].startswith("take with")
+            for rule in food_rules)
+        and all(rule["label"] for rule in food_rules),
+        "; ".join(rule["label"] for rule in food_rules),
+    )
+    hint = tick_mod._food_hint(document.by_name("Beta 40 mg"))
+    harness.check(
+        "the food hint fits inside a notification",
+        0 < len(hint) <= 80,
+        hint,
+    )
+
+    emergency_mod.set_field("blood_type", "O+")
+    emergency_mod.set_field("allergies", "penicillin, aspirin")
+    emergency_mod.set_field("status", "pregnant")
+    pregnancy_state = pregnancy_mod.check(active, emergency_mod.profile())
+    harness.check(
+        "pregnancy profile flags the NSAID",
+        pregnancy_state["active"]
+        and any(item["name"] == "Beta 40 mg" for item in pregnancy_state["findings"])
+        and all(item["alternative"] for item in pregnancy_state["findings"]),
+        ", ".join(f"{i['name']}:{i['risk']}" for i in pregnancy_state["findings"]),
+    )
+    emergency_mod.set_field("status", "none")
+
+    document = load_medicines()
+    document.by_name("Gamma 10 mg").missed_dose_note = "Never double it — ring the clinic"
+    save_medicines(document)
+    protocol = missed_mod.protocol_for(load_medicines().by_name("Gamma 10 mg"))
+    harness.check(
+        "a personal missed-dose note wins over the generic rule",
+        protocol["source"] == "personal"
+        and "ring the clinic" in protocol["text"],
+        f"{protocol['sourceLabel']}: {protocol['text']}",
+    )
+
+    document = load_medicines()
+    document.by_name("Alpha 5 mg").stock = 2
+    save_medicines(document)
+    refills = refill_mod.check(load_medicines().active(), profile=emergency_mod.profile())
+    harness.check(
+        "two days of pills counts as a refill warning",
+        any(row["name"] == "Alpha 5 mg" and row["warn"] for row in refills["medicines"])
+        and refills["warningDays"] == 3,
+        ", ".join(f"{r['name']}:{r['daysLeft']}d" for r in refills["medicines"][:3]),
+    )
+
+    for _ in range(3):
+        sideeffects_mod.log("Beta 40 mg", "drowsiness", "moderate")
+    repeats = sideeffects_mod.repeat_alerts()
+    harness.check(
+        "the third report of one effect raises a repeat alert",
+        len(repeats) == 1
+        and repeats[0]["count"] == 3
+        and repeats[0]["effect"] == "drowsiness",
+        str([{k: r[k] for k in ("medicine", "effect", "count", "worst")} for r in repeats]),
+    )
+
+    vitals_mod.add("bp", "128/82", now=morning)
+    vitals_mod.add("pulse", 71, now=morning)
+    vitals_chart = vitals_mod.chart(14, morning)
+    correlation = vitals_mod.correlate(active, read_history(), 30, morning)
+    harness.check(
+        "a blood-pressure reading keeps both numbers",
+        vitals_chart["count"] == 2
+        and vitals_chart["series"]["bp"][0]["value2"] == 82
+        and "bp" in vitals_chart["kinds"],
+        f"count={vitals_chart['count']}, bp={vitals_chart['series']['bp'][0]}",
+    )
+    harness.check(
+        "a reading is matched to the dose taken around it",
+        correlation["linked"] >= 1 and correlation["windowHours"] == 4,
+        f"linked={correlation['linked']}, unlinked={correlation['unlinked']}",
+    )
+
+    card = emergency_mod.card(active)
+    text_file = emergency_mod.export_wallet(active)
+    pdf_file = emergency_mod.export_wallet_pdf(active)
+    harness.check(
+        "the emergency card carries blood type and allergies",
+        card["bloodType"] == "O+"
+        and card["allergies"] == ["penicillin", "aspirin"]
+        and card["offline"] is True,
+        f"blood={card['bloodType']}, allergies={card['allergies']}",
+    )
+    harness.check(
+        "the printable card is written as text and as PDF",
+        text_file.read_text(encoding="utf-8").startswith("=")
+        and pdf_file.read_bytes()[:5] == b"%PDF-",
+        f"{text_file.name}, {pdf_file.name}",
+    )
+    harness.check(
+        "the offline emergency number is always on the card",
+        any(row["label"].startswith("Ambulance") and row["uri"] == "tel:123"
+            for row in emergency_mod.emergency_numbers()),
+        ", ".join(row["label"] for row in emergency_mod.emergency_numbers()),
+    )
+
+    review_state = review_mod.status()
+    harness.check(
+        "the first therapy review is due immediately",
+        review_state["due"] and review_state["never"] is True
+        and review_state["intervalMonths"] == 3,
+        f"last={review_state['lastLabel']}, next={review_state['nextLabel']}",
+    )
+
+    payload = panel_data.payload(now=morning + timedelta(minutes=30))
+    health = payload["health"]
+    expected_sections = (
+        "interactions", "food", "pregnancy", "adherence", "sideEffects",
+        "vitals", "missed", "refills", "review", "reports", "emergency",
+        "profile", "disclaimer", "sources", "updated",
+    )
+    harness.check(
+        "the panel payload carries every health section",
+        all(section in health for section in expected_sections)
+        and health["interactions"]["count"] >= 1
+        and health["sideEffects"]["repeats"][0]["count"] == 3
+        and health["emergency"]["bloodType"] == "O+"
+        and "lines" in health["reports"]["weekly"],
+        f"sections={[key for key in expected_sections if key not in health]}",
+    )
+
+    moment = morning + timedelta(minutes=30)
+    planned = tick_mod.build_health_notices(load_medicines(), read_history(), moment)
+    planned_kinds = {notice.kind for notice in planned}
+    harness.check(
+        "the health notifier covers every safety signal",
+        {"interaction", "food", "sideeffect", "refill", "review"} <= planned_kinds
+        and all(notice.summary and notice.body for notice in planned),
+        ", ".join(sorted(planned_kinds)),
+    )
+    harness.check(
+        "every health notice declares one of the known kinds",
+        all(notice.kind in (
+            "reminder", "overdue", "restock", "emergency", "interaction", "food",
+            "adherence", "refill", "sideeffect", "missed", "review", "pregnancy",
+        ) for notice in planned),
+        ", ".join(sorted(planned_kinds)),
+    )
+
+    first_tick = tick_mod.run_tick(dispatch=False, now=moment)
+    second_tick = tick_mod.run_tick(dispatch=False, now=moment)
+    fired_kinds = {notice.kind for notice in first_tick.fired}
+    harness.check(
+        "safety notices fire beside the dose reminders",
+        {"interaction", "food", "sideeffect"} <= fired_kinds,
+        ", ".join(sorted(fired_kinds)),
+    )
+    harness.check(
+        "health notices are deduplicated like the dose reminders",
+        not second_tick.fired,
+        ", ".join(notice.summary for notice in second_tick.fired),
+    )
+
+    review_mod.mark_reviewed(now=moment)
+    after_review = review_mod.status(moment)
+    harness.check(
+        "recording a review pushes the next one three months out",
+        after_review["due"] is False and after_review["never"] is False,
+        f"next={after_review['nextLabel']}",
     )
 
     harness.report()

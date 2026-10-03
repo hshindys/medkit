@@ -149,3 +149,123 @@ def history_between(
     entries: Iterable[HistoryEntry], start: datetime, end: datetime
 ) -> list[HistoryEntry]:
     return [entry for entry in entries if start <= entry.ts < end]
+
+
+# ---- generic local records (side effects, vitals, profile, review) ------
+#
+# Every health record MedKit keeps beyond the dose log lives in its own file.
+# Same rules as the rest of the store: plain JSON on this machine, atomic
+# writes for documents, append-only for logs, and a read that never raises —
+# a hand-edited file must degrade to "no records" instead of killing the bar.
+
+def read_json(path: Path, default: dict | list | None = None) -> dict | list:
+    if not path.exists():
+        return {} if default is None else default
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return {} if default is None else default
+    return raw
+
+
+def write_json(path: Path, payload: dict | list) -> None:
+    _atomic_write(path, json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+
+
+def read_jsonl(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    rows: list[dict] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            raw = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(raw, dict):
+            rows.append(raw)
+    return rows
+
+
+def append_jsonl(path: Path, payload: dict) -> dict:
+    paths.ensure_data_dir()
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return payload
+
+
+def load_profile() -> dict:
+    """Everything a first responder would need, and nothing else."""
+    default = {
+        "version": 1,
+        "name": "",
+        "birth_date": "",
+        "blood_type": "",
+        "allergies": [],
+        "conditions": [],
+        "emergency_contact": {"name": "", "phone": ""},
+        "doctor": {"name": "", "phone": ""},
+        "pharmacy": {"name": "", "phone": ""},
+        # none | pregnant | breastfeeding | trying | postpartum
+        "status": "none",
+        "weight_kg": None,
+        "height_cm": None,
+        "updated": "",
+    }
+    raw = read_json(paths.profile_file(), {})
+    if not isinstance(raw, dict):
+        return default
+    profile = dict(default)
+    profile.update(raw)
+    for key in ("allergies", "conditions"):
+        if not isinstance(profile.get(key), list):
+            profile[key] = []
+    for key in ("emergency_contact", "doctor", "pharmacy"):
+        if not isinstance(profile.get(key), dict):
+            profile[key] = dict(default[key])
+    return profile
+
+
+def save_profile(profile: dict) -> None:
+    profile = dict(profile)
+    profile["version"] = 1
+    profile["updated"] = datetime.now().astimezone().isoformat(timespec="seconds")
+    write_json(paths.profile_file(), profile)
+
+
+def read_sideeffects() -> list[dict]:
+    return read_jsonl(paths.sideeffects_file())
+
+
+def append_sideeffect(record: dict) -> dict:
+    return append_jsonl(paths.sideeffects_file(), record)
+
+
+def read_vitals() -> list[dict]:
+    return read_jsonl(paths.vitals_file())
+
+
+def append_vital(record: dict) -> dict:
+    return append_jsonl(paths.vitals_file(), record)
+
+
+def load_review() -> dict:
+    default = {"version": 1, "last_review": "", "next_review": "", "history": []}
+    raw = read_json(paths.review_file(), {})
+    if not isinstance(raw, dict):
+        return default
+    review = dict(default)
+    review.update(raw)
+    if not isinstance(review.get("history"), list):
+        review["history"] = []
+    return review
+
+
+def save_review(review: dict) -> None:
+    review = dict(review)
+    review["version"] = 1
+    write_json(paths.review_file(), review)

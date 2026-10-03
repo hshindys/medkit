@@ -1,0 +1,2394 @@
+{
+  "version": 1,
+  "updated": "2026-10-03",
+  "disclaimer": "This is not medical advice. These checks are an offline snapshot of published drug information and cannot see your full medical history. Talk to your doctor or pharmacist before changing any medicine.",
+  "sources": [
+    "DrugBank (open drug database) — drug–drug and drug–class interaction pairs",
+    "DailyMed / U.S. National Library of Medicine — labelling, food and pregnancy sections",
+    "MedlinePlus / NIH — patient-facing safety and missed-dose guidance",
+    "NHS BNF (bnf.nhs.uk) — interaction severity and alternatives in pregnancy"
+  ],
+  "classes": {
+    "nsaid": {
+      "label": "NSAID (anti-inflammatory painkiller)",
+      "members": [
+        "ibuprofen",
+        "naproxen",
+        "diclofenac",
+        "ketoprofen",
+        "piroxicam",
+        "meloxicam",
+        "indomethacin",
+        "ketorolac",
+        "aceclofenac",
+        "nimesulide",
+        "mefenamic acid",
+        "phenylbutazone",
+        "sulindac",
+        "tolmetin"
+      ]
+    },
+    "cox2": {
+      "label": "COX-2 inhibitor",
+      "members": [
+        "celecoxib",
+        "etoricoxib",
+        "parecoxib",
+        "rofecoxib"
+      ]
+    },
+    "ace_inhibitor": {
+      "label": "ACE inhibitor (blood pressure)",
+      "members": [
+        "lisinopril",
+        "enalapril",
+        "ramipril",
+        "perindopril",
+        "benazepril",
+        "captopril",
+        "fosinopril",
+        "quinapril",
+        "trandolapril",
+        "moexipril",
+        "cilazapril",
+        "imidapril"
+      ]
+    },
+    "arb": {
+      "label": "ARB — angiotensin receptor blocker (blood pressure)",
+      "members": [
+        "losartan",
+        "valsartan",
+        "irbesartan",
+        "candesartan",
+        "telmisartan",
+        "olmesartan",
+        "eprosartan",
+        "azilsartan",
+        "prosartan"
+      ]
+    },
+    "beta_blocker": {
+      "label": "Beta blocker (heart rate / blood pressure)",
+      "members": [
+        "bisoprolol",
+        "metoprolol",
+        "atenolol",
+        "propranolol",
+        "carvedilol",
+        "nebivolol",
+        "labetalol",
+        "timolol",
+        "betaxolol",
+        "acebutolol",
+        "celiprolol",
+        "pindolol",
+        "penbutolol"
+      ]
+    },
+    "ccb_dihydropyridine": {
+      "label": "Calcium channel blocker — dihydropyridine (blood pressure)",
+      "members": [
+        "amlodipine",
+        "nifedipine",
+        "felodipine",
+        "isradipine",
+        "lacidipine",
+        "nimodipine",
+        "nicardipine",
+        "lerkanidipine",
+        "nilvadipine"
+      ]
+    },
+    "ccb_non_dhp": {
+      "label": "Calcium channel blocker — verapamil / diltiazem (heart)",
+      "members": [
+        "diltiazem",
+        "verapamil",
+        "gallopamil"
+      ]
+    },
+    "thiazide": {
+      "label": "Thiazide diuretic (water tablet)",
+      "members": [
+        "hydrochlorothiazide",
+        "chlorthalidone",
+        "indapamide",
+        "metolazone",
+        "bendroflumethiazide",
+        "clopamide",
+        "hydroflumethiazide"
+      ]
+    },
+    "loop_diuretic": {
+      "label": "Loop diuretic (water tablet)",
+      "members": [
+        "furosemide",
+        "bumetanide",
+        "torasemide",
+        "torsemide",
+        "ethacrynic acid"
+      ]
+    },
+    "k_sparing": {
+      "label": "Potassium-sparing diuretic",
+      "members": [
+        "spironolactone",
+        "eplerenone",
+        "amiloride",
+        "triamterene",
+        "canrenone"
+      ]
+    },
+    "warfarin": {
+      "label": "Warfarin (blood thinner)",
+      "members": [
+        "warfarin",
+        "acenocoumarol",
+        "phenprocoumon"
+      ]
+    },
+    "doac": {
+      "label": "Direct oral anticoagulant (blood thinner)",
+      "members": [
+        "apixaban",
+        "rivaroxaban",
+        "edoxaban",
+        "dabigatran"
+      ]
+    },
+    "antiplatelet": {
+      "label": "Antiplatelet (clot prevention)",
+      "members": [
+        "aspirin",
+        "clopidogrel",
+        "ticagrelor",
+        "prasugrel",
+        "dipyridamole",
+        "cilostazol",
+        "ticlopidine"
+      ]
+    },
+    "statin": {
+      "label": "Statin (cholesterol)",
+      "members": [
+        "atorvastatin",
+        "simvastatin",
+        "rosuvastatin",
+        "pravastatin",
+        "fluvastatin",
+        "lovastatin",
+        "pitavastatin"
+      ]
+    },
+    "fibrate": {
+      "label": "Fibrate (cholesterol / triglycerides)",
+      "members": [
+        "fenofibrate",
+        "gemfibrozil",
+        "bezafibrate",
+        "ciprofibrate",
+        "etofibrate"
+      ]
+    },
+    "ezetimibe": {
+      "label": "Ezetimibe (cholesterol)",
+      "members": [
+        "ezetimibe"
+      ]
+    },
+    "ppi": {
+      "label": "Proton pump inhibitor (acid reflux)",
+      "members": [
+        "omeprazole",
+        "esomeprazole",
+        "pantoprazole",
+        "lansoprazole",
+        "rabeprazole",
+        "dexlansoprazole"
+      ]
+    },
+    "ssri": {
+      "label": "SSRI antidepressant",
+      "members": [
+        "fluoxetine",
+        "sertraline",
+        "paroxetine",
+        "citalopram",
+        "escitalopram",
+        "fluvoxamine"
+      ]
+    },
+    "snri": {
+      "label": "SNRI antidepressant",
+      "members": [
+        "venlafaxine",
+        "duloxetine",
+        "desvenlafaxine",
+        "milnacipran",
+        "levomilnacipran"
+      ]
+    },
+    "tca": {
+      "label": "Tricyclic antidepressant",
+      "members": [
+        "amitriptyline",
+        "nortriptyline",
+        "imipramine",
+        "clomipramine",
+        "dosulepin",
+        "amoxapine",
+        "doxepin"
+      ]
+    },
+    "maoi": {
+      "label": "MAO inhibitor antidepressant",
+      "members": [
+        "phenelzine",
+        "tranylcypromine",
+        "isocarboxazid",
+        "moclobemide",
+        "selegiline",
+        "rasagiline"
+      ]
+    },
+    "opioid": {
+      "label": "Opioid painkiller",
+      "members": [
+        "codeine",
+        "morphine",
+        "oxycodone",
+        "hydrocodone",
+        "fentanyl",
+        "methadone",
+        "pethidine",
+        "meperidine",
+        "hydromorphone",
+        "oxymorphone",
+        "dihydrocodeine",
+        "tapentadol"
+      ]
+    },
+    "tramadol": {
+      "label": "Tramadol (weak opioid)",
+      "members": [
+        "tramadol"
+      ]
+    },
+    "benzodiazepine": {
+      "label": "Benzodiazepine (calming / sleep)",
+      "members": [
+        "diazepam",
+        "lorazepam",
+        "alprazolam",
+        "clonazepam",
+        "midazolam",
+        "nitrazepam",
+        "flunitrazepam",
+        "chlordiazepoxide",
+        "temazepam",
+        "oxazepam",
+        "bromazepam",
+        "clorazepate",
+        "flurazepam"
+      ]
+    },
+    "z_drug": {
+      "label": "Z-drug (sleep tablet)",
+      "members": [
+        "zopiclone",
+        "zolpidem",
+        "zaleplon",
+        "eszopiclone"
+      ]
+    },
+    "lithium": {
+      "label": "Lithium (mood stabiliser)",
+      "members": [
+        "lithium",
+        "lithium carbonate",
+        "lithium citrate"
+      ]
+    },
+    "valproate": {
+      "label": "Valproate (anti-epileptic / mood)",
+      "members": [
+        "valproic acid",
+        "valproate",
+        "sodium valproate",
+        "valpromide",
+        "divalproex"
+      ]
+    },
+    "carbamazepine": {
+      "label": "Carbamazepine (anti-epileptic)",
+      "members": [
+        "carbamazepine",
+        "oxcarbazepine"
+      ]
+    },
+    "antiepileptic_other": {
+      "label": "Other anti-epileptic",
+      "members": [
+        "phenytoin",
+        "phenobarbital",
+        "primidone",
+        "lamotrigine",
+        "levetiracetam",
+        "topiramate",
+        "zonisamide",
+        "gabapentin",
+        "pregabalin",
+        "tiagabine",
+        "vigabatrin",
+        "lacosamide"
+      ]
+    },
+    "methotrexate": {
+      "label": "Methotrexate (weekly, chemo / arthritis)",
+      "members": [
+        "methotrexate",
+        "aminopterin"
+      ]
+    },
+    "levothyroxine": {
+      "label": "Levothyroxine (thyroid hormone)",
+      "members": [
+        "levothyroxine",
+        "liothyronine",
+        "thyroxine"
+      ]
+    },
+    "digoxin": {
+      "label": "Digoxin (heart failure)",
+      "members": [
+        "digoxin",
+        "digitoxin"
+      ]
+    },
+    "amiodarone": {
+      "label": "Amiodarone (heart rhythm)",
+      "members": [
+        "amiodarone",
+        "dronedarone",
+        "sotalol",
+        "dofetilide",
+        "ibutilide",
+        "propafenone",
+        "flecainide"
+      ]
+    },
+    "macrolide": {
+      "label": "Macrolide antibiotic",
+      "members": [
+        "erythromycin",
+        "clarithromycin",
+        "azithromycin",
+        "roxithromycin",
+        "telithromycin"
+      ]
+    },
+    "fluoroquinolone": {
+      "label": "Fluoroquinolone antibiotic",
+      "members": [
+        "ciprofloxacin",
+        "levofloxacin",
+        "ofloxacin",
+        "norfloxacin",
+        "moxifloxacin",
+        "lomefloxacin",
+        "nalidixic acid"
+      ]
+    },
+    "tetracycline": {
+      "label": "Tetracycline antibiotic",
+      "members": [
+        "doxycycline",
+        "tetracycline",
+        "minocycline",
+        "tigecycline",
+        "demeclocycline"
+      ]
+    },
+    "azole": {
+      "label": "Antifungal azole",
+      "members": [
+        "fluconazole",
+        "itraconazole",
+        "ketoconazole",
+        "voriconazole",
+        "posaconazole",
+        "miconazole",
+        "econazole"
+      ]
+    },
+    "aminoglycoside": {
+      "label": "Aminoglycoside antibiotic",
+      "members": [
+        "gentamicin",
+        "amikacin",
+        "tobramycin",
+        "streptomycin",
+        "netilmicin",
+        "neomycin"
+      ]
+    },
+    "sulfa": {
+      "label": "Sulphonamide antibiotic (incl. co-trimoxazole)",
+      "members": [
+        "sulfamethoxazole",
+        "trimethoprim",
+        "co-trimoxazole",
+        "sulfadiazine",
+        "sulfasalazine",
+        "dapsone"
+      ]
+    },
+    "biguanide": {
+      "label": "Metformin (diabetes)",
+      "members": [
+        "metformin"
+      ]
+    },
+    "sulfonylurea": {
+      "label": "Sulfonylurea (diabetes, lowers sugar)",
+      "members": [
+        "gliclazide",
+        "glibenclamide",
+        "glyburide",
+        "glimepiride",
+        "glipizide",
+        "tolbutamide",
+        "chlorpropamide",
+        "gliquidone",
+        "glisoxepide"
+      ]
+    },
+    "sglt2": {
+      "label": "SGLT2 inhibitor (diabetes)",
+      "members": [
+        "empagliflozin",
+        "dapagliflozin",
+        "canagliflozin",
+        "ertugliflozin"
+      ]
+    },
+    "dpp4": {
+      "label": "DPP-4 inhibitor (diabetes)",
+      "members": [
+        "sitagliptin",
+        "vildagliptin",
+        "saxagliptin",
+        "linagliptin",
+        "alogliptin"
+      ]
+    },
+    "insulin": {
+      "label": "Insulin",
+      "members": [
+        "insulin",
+        "insulin glargine",
+        "insulin lispro",
+        "insulin aspart",
+        "insulin detemir",
+        "insulin glulisine",
+        "human insulin",
+        "novorapid",
+        "lantus",
+        "humulin"
+      ]
+    },
+    "steroid": {
+      "label": "Corticosteroid",
+      "members": [
+        "prednisolone",
+        "prednisone",
+        "dexamethasone",
+        "hydrocortisone",
+        "methylprednisolone",
+        "betamethasone",
+        "triamcinolone",
+        "budesonide",
+        "fluticasone",
+        "beclometasone"
+      ]
+    },
+    "theophylline": {
+      "label": "Theophylline (asthma)",
+      "members": [
+        "theophylline",
+        "aminophylline"
+      ]
+    },
+    "allopurinol": {
+      "label": "Anti-gout (xanthine oxidase inhibitor)",
+      "members": [
+        "allopurinol",
+        "febuxostat",
+        "oxypurinol"
+      ]
+    },
+    "immunosuppressant": {
+      "label": "Transplant / autoimmune immunosuppressant",
+      "members": [
+        "ciclosporin",
+        "cyclosporine",
+        "tacrolimus",
+        "sirolimus",
+        "mycophenolate",
+        "azathioprine",
+        "everolimus"
+      ]
+    },
+    "nitrate": {
+      "label": "Nitrate (angina)",
+      "members": [
+        "isosorbide mononitrate",
+        "isosorbide dinitrate",
+        "nitroglycerin",
+        "glyceryl trinitrate",
+        "isosorbide"
+      ]
+    },
+    "alpha_blocker": {
+      "label": "Alpha blocker (blood pressure / prostate)",
+      "members": [
+        "tamsulosin",
+        "doxazosin",
+        "prazosin",
+        "alfuzosin",
+        "terazosin",
+        "silodosin"
+      ]
+    },
+    "pd5": {
+      "label": "PDE5 inhibitor (erectile dysfunction / pulmonary hypertension)",
+      "members": [
+        "sildenafil",
+        "tadalafil",
+        "vardenafil",
+        "avanafil"
+      ]
+    },
+    "antihistamine_cns": {
+      "label": "Sedating antihistamine",
+      "members": [
+        "diphenhydramine",
+        "doxylamine",
+        "hydroxyzine",
+        "promethazine",
+        "chlorphenamine",
+        "chlorpheniramine",
+        "cyproheptadine",
+        "alimemazine"
+      ]
+    },
+    "antihistamine_non_cns": {
+      "label": "Non-drowsy antihistamine",
+      "members": [
+        "cetirizine",
+        "loratadine",
+        "fexofenadine",
+        "levocetirizine",
+        "desloratadine",
+        "bilastine"
+      ]
+    },
+    "bisphosphonate": {
+      "label": "Bisphosphonate (bone)",
+      "members": [
+        "alendronate",
+        "alendronic acid",
+        "risedronate",
+        "ibandronate",
+        "zoledronic acid",
+        "etidronate",
+        "pamidronate"
+      ]
+    },
+    "iron": {
+      "label": "Iron supplement",
+      "members": [
+        "ferrous sulfate",
+        "ferrous fumarate",
+        "ferrous gluconate",
+        "iron",
+        "ferric",
+        "sucrosomial iron",
+        "ferrofon"
+      ]
+    },
+    "potassium": {
+      "label": "Potassium supplement",
+      "members": [
+        "potassium chloride",
+        "potassium",
+        "kalium",
+        "k-dur",
+        "slow-k"
+      ]
+    },
+    "calcium": {
+      "label": "Calcium / vitamin D supplement",
+      "members": [
+        "calcium carbonate",
+        "calcium citrate",
+        "calcium gluconate",
+        "calcium",
+        "cholecalciferol",
+        "vitamin d",
+        "calcitriol",
+        "caltrate"
+      ]
+    },
+    "ocp": {
+      "label": "Hormonal contraception",
+      "members": [
+        "ethinylestradiol",
+        "levonorgestrel",
+        "desogestrel",
+        "etonogestrel",
+        "drospirenone",
+        "norgestimate",
+        "cyproterone",
+        "medroxyprogesterone",
+        "ulipristal",
+        "norethisterone"
+      ]
+    },
+    "salbutamol": {
+      "label": "Reliever inhaler (salbutamol)",
+      "members": [
+        "salbutamol",
+        "albuterol",
+        "levalbuterol",
+        "terbutaline",
+        "procaterol"
+      ]
+    },
+    "antipsychotic": {
+      "label": "Antipsychotic",
+      "members": [
+        "risperidone",
+        "olanzapine",
+        "quetiapine",
+        "haloperidol",
+        "aripiprazole",
+        "clozapine",
+        "ziprasidone",
+        "chlorpromazine",
+        "amisulpride",
+        "lurasidone"
+      ]
+    }
+  },
+  "synonyms": {
+    "concor": "bisoprolol",
+    "concor cor": "bisoprolol",
+    "selozok": "bisoprolol",
+    "bisogamma": "bisoprolol",
+    "emcor": "bisoprolol",
+    "loprin": "aspirin",
+    "disprin": "aspirin",
+    "aspirin protect": "aspirin",
+    "brufen": "ibuprofen",
+    "nurofen": "ibuprofen",
+    "advil": "ibuprofen",
+    "motrin": "ibuprofen",
+    "cataflam": "diclofenac",
+    "voltaren": "diclofenac",
+    "arthotec": "diclofenac",
+    "naklofen": "diclofenac",
+    "ponstan": "mefenamic acid",
+    "feldene": "piroxicam",
+    "mobic": "meloxicam",
+    "nexen": "nimesulide",
+    "nise": "nimesulide",
+    "naprosyn": "naproxen",
+    "prophenid": "ketoprofen",
+    "celebrex": "celecoxib",
+    "arcoxia": "etoricoxib",
+    "zestril": "lisinopril",
+    "prinivil": "lisinopril",
+    "renitec": "enalapril",
+    "vasotec": "enalapril",
+    "tritace": "ramipril",
+    "delix": "ramipril",
+    "coveram": "perindopril",
+    "coverpresse": "perindopril",
+    "provinace": "perindopril",
+    "capoten": "captopril",
+    "acepril": "captopril",
+    "cozaar": "losartan",
+    "diovan": "valsartan",
+    "aprovel": "irbesartan",
+    "atacand": "candesartan",
+    "micardis": "telmisartan",
+    "olmetec": "olmesartan",
+    "tenormin": "atenolol",
+    "lopressor": "metoprolol",
+    "selozok xr": "metoprolol",
+    "dipresium": "metoprolol",
+    "inderal": "propranolol",
+    "coreg": "carvedilol",
+    "dilatrend": "carvedilol",
+    "nebilet": "nebivolol",
+    "tenloc": "nebivolol",
+    "trandate": "labetalol",
+    "amlocard": "amlodipine",
+    "amlopin": "amlodipine",
+    "amlor": "amlodipine",
+    "amlong": "amlodipine",
+    "norvasc": "amlodipine",
+    "adipine": "nifedipine",
+    "adalat": "nifedipine",
+    "procardia": "nifedipine",
+    "adizem": "diltiazem",
+    "tildiem": "diltiazem",
+    "cardizem": "diltiazem",
+    "isoptin": "verapamil",
+    "calan": "verapamil",
+    "lasix": "furosemide",
+    "frusemide": "furosemide",
+    "demadex": "torasemide",
+    "dyrenium": "triamterene",
+    "amiloride hcl": "amiloride",
+    "aldactone": "spironolactone",
+    "aldactazide": "spironolactone",
+    "inspra": "eplerenone",
+    "microzide": "hydrochlorothiazide",
+    "hydrozide": "hydrochlorothiazide",
+    "esidrix": "hydrochlorothiazide",
+    "maretil": "chlorthalidone",
+    "natrilix": "indapamide",
+    "marevan": "warfarin",
+    "coumadin": "warfarin",
+    "xarelto": "rivaroxaban",
+    "eliquis": "apixaban",
+    "pradaxa": "dabigatran",
+    "lixisenta": "edoxaban",
+    "plavix": "clopidogrel",
+    "iscover": "clopidogrel",
+    "zient": "clopidogrel",
+    "effient": "prasugrel",
+    "brilinta": "ticagrelor",
+    "lipitor": "atorvastatin",
+    "storvas": "atorvastatin",
+    "caduet": "atorvastatin",
+    "crestor": "rosuvastatin",
+    "zocor": "simvastatin",
+    "velosian": "simvastatin",
+    "provachol": "pravastatin",
+    "lescol": "fluvastatin",
+    "livostin": "lovastatin",
+    "tricor": "fenofibrate",
+    "lipanthyl": "fenofibrate",
+    "gemfibrozil lopid": "gemfibrozil",
+    "zetia": "ezetimibe",
+    "ezetrol": "ezetimibe",
+    "losec": "omeprazole",
+    "losec mups": "omeprazole",
+    "omiz": "omeprazole",
+    "nexium": "esomeprazole",
+    "emanera": "esomeprazole",
+    "inexium": "esomeprazole",
+    "pantoloc": "pantoprazole",
+    "pantozol": "pantoprazole",
+    "controloc": "pantoprazole",
+    "takepron": "lansoprazole",
+    "zoton": "lansoprazole",
+    "prozac": "fluoxetine",
+    "adofen": "fluoxetine",
+    "zoloft": "sertraline",
+    "lustral": "sertraline",
+    "seronil": "sertraline",
+    "paxil": "paroxetine",
+    "seroxat": "paroxetine",
+    "cipralex": "escitalopram",
+    "lexapro": "escitalopram",
+    "pram": "escitalopram",
+    "celexa": "citalopram",
+    "efexor": "venlafaxine",
+    "dolvig": "venlafaxine",
+    "cymbalta": "duloxetine",
+    "duzoxin": "duloxetine",
+    "saroten": "amitriptyline",
+    "tryptizol": "amitriptyline",
+    "lantra": "venlafaxine",
+    "aurorix": "moclobemide",
+    "nardil": "phenelzine",
+    "parnate": "tranylcypromine",
+    "tramal": "tramadol",
+    "dolol": "tramadol",
+    "adamon": "tramadol",
+    "ronal": "codeine",
+    "catapres": "clonidine",
+    "dopegyt": "methyldopa",
+    "aldomet": "methyldopa",
+    "lithicarb": "lithium",
+    "carbolith": "lithium",
+    "epilim": "sodium valproate",
+    "depakine": "valproic acid",
+    "tegretol": "carbamazepine",
+    "neurontin": "gabapentin",
+    "lyrica": "pregabalin",
+    "keppra": "levetiracetam",
+    "lamictal": "lamotrigine",
+    "trexall": "methotrexate",
+    "euthyrox": "levothyroxine",
+    "thyroxin": "levothyroxine",
+    "eltroxin": "levothyroxine",
+    "puran t4": "levothyroxine",
+    "lanoxin": "digoxin",
+    "cordarone": "amiodarone",
+    "rhythmol": "propafenone",
+    "erythrocin": "erythromycin",
+    "zithromax": "azithromycin",
+    "z-pack": "azithromycin",
+    "biaxin": "clarithromycin",
+    "klaricid": "clarithromycin",
+    "ciproxin": "ciprofloxacin",
+    "cipro": "ciprofloxacin",
+    "levaquin": "levofloxacin",
+    "moxatag": "moxifloxacin",
+    "vibramycin": "doxycycline",
+    "doxyhexal": "doxycycline",
+    "doryx": "doxycycline",
+    "diflucan": "fluconazole",
+    "sporanox": "itraconazole",
+    "nizoral": "ketoconazole",
+    "vfend": "voriconazole",
+    "gentamicin garamycin": "gentamicin",
+    "bactrim": "co-trimoxazole",
+    "septrin": "co-trimoxazole",
+    "rocephin": "ceftriaxone",
+    "augmentin": "amoxicillin",
+    "glucophage": "metformin",
+    "metfogen": "metformin",
+    "diabetmin": "metformin",
+    "januvia": "sitagliptin",
+    "galvus": "vildagliptin",
+    "ojard": "empagliflozin",
+    "forxiga": "dapagliflozin",
+    "amaryl": "glimepiride",
+    "daonil": "glibenclamide",
+    "maninil": "glibenclamide",
+    "minidiab": "glipizide",
+    "diamicron": "gliclazide",
+    "diamicron mr": "gliclazide",
+    "lantus": "insulin glargine",
+    "levemir": "insulin detemir",
+    "novorapid": "insulin aspart",
+    "humulin": "human insulin",
+    "humalog": "insulin lispro",
+    "ventolin": "salbutamol",
+    "proair": "salbutamol",
+    "seretide": "fluticasone",
+    "pulmicort": "budesonide",
+    "becotide": "beclometasone",
+    "flixotide": "fluticasone",
+    "prednisolone deltacortril": "prednisolone",
+    "deltacortril": "prednisolone",
+    "prednisone deltasone": "prednisone",
+    "zyloric": "allopurinol",
+    "maxipuric": "febuxostat",
+    "sandimmun": "ciclosporin",
+    "neoral": "ciclosporin",
+    "prograf": "tacrolimus",
+    "imuran": "azathioprine",
+    "cellcept": "mycophenolate",
+    "isordil": "isosorbide dinitrate",
+    "imdur": "isosorbide mononitrate",
+    "monoket": "isosorbide mononitrate",
+    "nitrostat": "nitroglycerin",
+    "flomax": "tamsulosin",
+    "uromax": "tamsulosin",
+    "cardura": "doxazosin",
+    "minipress": "prazosin",
+    "viagra": "sildenafil",
+    "cialis": "tadalafil",
+    "levitra": "vardenafil",
+    "benadryl": "diphenhydramine",
+    "piriton": "chlorphenamine",
+    "zirtec": "cetirizine",
+    "zyrtec": "cetirizine",
+    "claritin": "loratadine",
+    "clarityn": "loratadine",
+    "allegra": "fexofenadine",
+    "telfast": "fexofenadine",
+    "fosamax": "alendronate",
+    "actonel": "risedrone",
+    "bondronat": "ibandronate",
+    "aclasta": "zoledronic acid",
+    "ferrofon": "ferrous sulfate",
+    "iferon": "ferrous sulfate",
+    "neutrofer": "ferrous fumarate",
+    "sandocal": "calcium carbonate",
+    "caltrate": "calcium carbonate",
+    "usal": "cholecalciferol",
+    "dayvit": "cholecalciferol",
+    "microgynon": "ethinylestradiol",
+    "yasmin": "drospirenone",
+    "cerazette": "desogestrel",
+    "noristerol": "norethisterone",
+    "primolut": "norethisterone",
+    "postinor": "levonorgestrel",
+    "motilium": "domperidone",
+    "antramax": "domperidone",
+    "zofran": "ondansetron",
+    "colospa": "mebeverine",
+    "buscopan": "hyoscine",
+    "spiriva": "tiotropium",
+    "atrovent": "ipratropium",
+    "rivocor": "nebivolol",
+    "hypol": "prazosin",
+    "moduretic": "amiloride"
+  },
+  "interactions": [
+    {
+      "a": "nsaid",
+      "b": [
+        "ace_inhibitor"
+      ],
+      "severity": "severe",
+      "effect": "NSAIDs block the kidney's protective prostaglandins, so the ACE inhibitor loses part of its blood-pressure effect and the risk of acute kidney injury rises.",
+      "advice": "Avoid regular NSAID use. Ask your doctor for paracetamol or a topical NSAID instead; if it is unavoidable, use the lowest dose for the shortest time and check kidney function and potassium."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "arb"
+      ],
+      "severity": "severe",
+      "effect": "NSAIDs reduce the blood-pressure lowering of ARBs and can impair kidney function, especially when you are dehydrated.",
+      "advice": "Prefer paracetamol. If an NSAID is essential, use it briefly, drink normally and ask for a kidney function and potassium check."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "loop_diuretic",
+        "thiazide"
+      ],
+      "severity": "severe",
+      "effect": "The combination blunts the diuretic's effect, retains sodium and can strain the kidneys — the classic 'triple whammy' when an ACE inhibitor or ARB is also present.",
+      "advice": "Avoid combining with an ACE inhibitor/ARB. Use the lowest NSAID dose for the shortest time and ask for kidney function, sodium and potassium checks."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "k_sparing"
+      ],
+      "severity": "severe",
+      "effect": "Both raise potassium; together they can cause dangerous hyperkalaemia (high potassium), which can disturb the heart rhythm.",
+      "advice": "Avoid the combination. If it cannot be changed, your doctor should monitor serum potassium closely."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "beta_blocker"
+      ],
+      "severity": "moderate",
+      "effect": "NSAIDs can reduce the blood-pressure lowering effect of beta blockers and may raise blood pressure.",
+      "advice": "Use paracetamol where possible; if you need an NSAID, keep the dose low and short and monitor your blood pressure at home."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "ccb_dihydropyridine",
+        "ccb_non_dhp"
+      ],
+      "severity": "moderate",
+      "effect": "NSAIDs can oppose the blood-pressure lowering of calcium channel blockers and may cause fluid retention.",
+      "advice": "Prefer paracetamol. If an NSAID is needed, keep it short and watch for ankle swelling and rising blood pressure."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "warfarin"
+      ],
+      "severity": "severe",
+      "effect": "NSAIDs damage the stomach lining and inhibit platelets, multiplying the risk of gastrointestinal bleeding with warfarin.",
+      "advice": "Do not take NSAIDs with warfarin. Use paracetamol (at normal doses) and contact your prescriber or an emergency service if you notice black stools, vomiting blood or unusual bruising."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "doac"
+      ],
+      "severity": "severe",
+      "effect": "Additive bleeding risk, mainly gastrointestinal, with little benefit gained.",
+      "advice": "Avoid regular NSAIDs with a direct oral anticoagulant; paracetamol is the usual alternative."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "antiplatelet"
+      ],
+      "severity": "severe",
+      "effect": "Combined platelet inhibition plus direct stomach irritation substantially increases the chance of ulceration and bleeding.",
+      "advice": "Avoid unless your cardiologist has specifically approved it; if so, take with food and for the shortest possible time, and ask about a stomach protector."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "ssri",
+        "snri"
+      ],
+      "severity": "moderate",
+      "effect": "SSRIs/SNRIs reduce platelet function and NSAIDs irritate the gut — together they raise the risk of gastrointestinal bleeding.",
+      "advice": "Prefer paracetamol; if an NSAID is unavoidable, use the lowest dose and tell your doctor about any black stools or stomach pain."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "methotrexate"
+      ],
+      "severity": "severe",
+      "effect": "NSAIDs reduce methotrexate clearance and can push it into a toxic range, especially at higher doses.",
+      "advice": "Avoid regular NSAIDs with methotrexate. Paracetamol is usually preferred; confirm with your prescriber."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "lithium"
+      ],
+      "severity": "severe",
+      "effect": "NSAIDs reduce lithium excretion, so lithium levels can climb into the toxic range.",
+      "advice": "Avoid. If you need a painkiller, use paracetamol and ask for a lithium level check."
+    },
+    {
+      "a": "nsaid",
+      "b": [
+        "ssri"
+      ],
+      "severity": "moderate",
+      "effect": "Additive bleeding risk (see the general SSRI + NSAID rule).",
+      "advice": "Prefer paracetamol."
+    },
+    {
+      "a": "ace_inhibitor",
+      "b": "arb",
+      "severity": "severe",
+      "effect": "Two drugs blocking the same system: no extra benefit, but a much higher risk of high potassium and kidney injury.",
+      "advice": "This pairing is almost always an error — contact your prescriber to keep only one of them."
+    },
+    {
+      "a": "ace_inhibitor",
+      "b": [
+        "k_sparing",
+        "potassium"
+      ],
+      "severity": "severe",
+      "effect": "ACE inhibitors and potassium-sparing diuretics or supplements both raise potassium; hyperkalaemia can stop the heart.",
+      "advice": "Avoid potassium supplements and watch for muscle weakness or palpitations; your doctor should check potassium regularly."
+    },
+    {
+      "a": "arb",
+      "b": [
+        "k_sparing",
+        "potassium"
+      ],
+      "severity": "severe",
+      "effect": "Additive potassium rise with risk of cardiac arrhythmia.",
+      "advice": "Avoid supplements; ask for regular potassium monitoring."
+    },
+    {
+      "a": "warfarin",
+      "b": [
+        "statin",
+        "fibrate",
+        "amiodarone",
+        "macrolide",
+        "azole",
+        "ssri",
+        "azole"
+      ],
+      "severity": "severe",
+      "effect": "These medicines change how warfarin is broken down or how it acts on platelets, so the INR can swing either way and bleeding risk rises.",
+      "advice": "Your INR needs checking within a few days of starting or stopping any of them. Never change the warfarin dose yourself."
+    },
+    {
+      "a": "warfarin",
+      "b": [
+        "nsaid"
+      ],
+      "severity": "severe",
+      "effect": "High risk of gastrointestinal bleeding.",
+      "advice": "Do not combine; use paracetamol instead."
+    },
+    {
+      "a": "warfarin",
+      "b": [
+        "aspirin"
+      ],
+      "severity": "severe",
+      "effect": "Warfarin plus an antiplatelet markedly increases bleeding risk.",
+      "advice": "Only ever take this combination under explicit cardiology instruction, with a stomach protector."
+    },
+    {
+      "a": "doac",
+      "b": [
+        "antiplatelet",
+        "ssri"
+      ],
+      "severity": "moderate",
+      "effect": "Bleeding time increases.",
+      "advice": "Watch for easy bruising, nosebleeds or blood in the urine; ask your doctor whether the antiplatelet is still needed."
+    },
+    {
+      "a": "amiodarone",
+      "b": [
+        "digoxin"
+      ],
+      "severity": "severe",
+      "effect": "Amiodarone can roughly double digoxin levels, causing nausea, visual disturbance and dangerous heart rhythms.",
+      "advice": "Your doctor should halve the digoxin dose and check the level when amiodarone starts."
+    },
+    {
+      "a": "amiodarone",
+      "b": [
+        "statin"
+      ],
+      "severity": "severe",
+      "effect": "Amiodarone raises simvastatin/atorvastatin exposure, increasing the risk of muscle breakdown (rhabdomyolysis).",
+      "advice": "Dose limits apply (simvastatin 20 mg). Report unexplained muscle pain, tenderness or dark urine urgently."
+    },
+    {
+      "a": "amiodarone",
+      "b": [
+        "beta_blocker",
+        "ccb_non_dhp"
+      ],
+      "severity": "severe",
+      "effect": "Additive slowing of the heart — severe bradycardia or heart block.",
+      "advice": "Watch for a pulse under 50, dizziness or fainting and seek urgent care; your doctor may need to adjust doses."
+    },
+    {
+      "a": "amiodarone",
+      "b": [
+        "ssri"
+      ],
+      "severity": "moderate",
+      "effect": "Both can prolong the QT interval, raising the risk of a fast, irregular heart rhythm.",
+      "advice": "Report palpitations or fainting; avoid other QT-prolonging drugs where possible."
+    },
+    {
+      "a": "macrolide",
+      "b": [
+        "warfarin"
+      ],
+      "severity": "severe",
+      "effect": "Clarithromycin and erythromycin strongly inhibit warfarin breakdown, spiking the INR.",
+      "advice": "An INR check is needed within 3–5 days; report bruising or bleeding."
+    },
+    {
+      "a": "macrolide",
+      "b": [
+        "ccb_non_dhp",
+        "statin"
+      ],
+      "severity": "moderate",
+      "effect": "Raised levels of the other drug: more diltiazem/verapamil effect (slow heart rate) or more statin (muscle pain).",
+      "advice": "Short courses are usually acceptable, but report muscle pain, swelling or a slow pulse."
+    },
+    {
+      "a": "macrolide",
+      "b": [
+        "theophylline"
+      ],
+      "severity": "severe",
+      "effect": "Theophylline levels can rise to toxic seizures and arrhythmias.",
+      "advice": "Avoid the combination; if prescribed, theophylline levels must be monitored."
+    },
+    {
+      "a": "fluoroquinolone",
+      "b": [
+        "warfarin",
+        "theophylline",
+        "tizanidine"
+      ],
+      "severity": "severe",
+      "effect": "Fluoroquinolones inhibit the enzymes that clear these drugs, causing toxicity.",
+      "advice": "Avoid or monitor closely; tell your prescriber you take these."
+    },
+    {
+      "a": "fluoroquinolone",
+      "b": [
+        "steroid"
+      ],
+      "severity": "moderate",
+      "effect": "Combined use raises the risk of tendon rupture, especially over 60 or with a transplant.",
+      "advice": "Stop the antibiotic and contact your doctor at the first sign of tendon pain or swelling."
+    },
+    {
+      "a": "macrolide",
+      "b": [
+        "fluoroquinolone"
+      ],
+      "severity": "moderate",
+      "effect": "Both prolong the QT interval; the combination can trigger a dangerous heart rhythm.",
+      "advice": "Prefer a different antibiotic if one is available; report palpitations or fainting."
+    },
+    {
+      "a": "ssri",
+      "b": [
+        "maoi"
+      ],
+      "severity": "severe",
+      "effect": "Serotonin syndrome: agitation, high temperature, sweating, jerky muscles, fast heart rate — a medical emergency.",
+      "advice": "A 14-day washout is required in both directions. Never combine; seek emergency care if symptoms appear."
+    },
+    {
+      "a": "ssri",
+      "b": [
+        "tramadol",
+        "opioid"
+      ],
+      "severity": "severe",
+      "effect": "Serotonin syndrome plus raised sedation and low sodium.",
+      "advice": "Only under specialist supervision; avoid driving and report confusion, shaking or high temperature."
+    },
+    {
+      "a": "maoi",
+      "b": [
+        "tramadol",
+        "opioid",
+        "antihistamine_cns"
+      ],
+      "severity": "severe",
+      "effect": "Risk of serotonin syndrome, hypertensive crisis or severe respiratory depression.",
+      "advice": "Do not combine."
+    },
+    {
+      "a": "ssri",
+      "b": [
+        "tca"
+      ],
+      "severity": "moderate",
+      "effect": "SSRIs raise tricyclic levels and both affect serotonin; toxicity and ECG changes are possible.",
+      "advice": "Common but requires monitoring — report tremor, confusion, dry mouth or palpitations."
+    },
+    {
+      "a": "ssri",
+      "b": [
+        "tramadol"
+      ],
+      "severity": "severe",
+      "effect": "Serotonin syndrome and reduced seizure threshold.",
+      "advice": "Avoid where possible; use the lowest effective tramadol dose."
+    },
+    {
+      "a": "opioid",
+      "b": [
+        "benzodiazepine",
+        "z_drug",
+        "antihistamine_cns"
+      ],
+      "severity": "severe",
+      "effect": "Combined sedation can slow breathing to a fatal level.",
+      "advice": "Avoid alcohol and other sedatives; seek urgent help for drowsiness or slow breathing. This combination is a recognised overdose risk."
+    },
+    {
+      "a": "opioid",
+      "b": [
+        "maoi"
+      ],
+      "severity": "severe",
+      "effect": "Risk of serotonin syndrome and unpredictable opioid toxicity.",
+      "advice": "Do not combine."
+    },
+    {
+      "a": "benzodiazepine",
+      "b": [
+        "z_drug"
+      ],
+      "severity": "severe",
+      "effect": "Additive sedation, falls and memory impairment.",
+      "advice": "Rarely justified together — ask your prescriber to review."
+    },
+    {
+      "a": "lithium",
+      "b": [
+        "thiazide",
+        "loop_diuretic",
+        "nsaid",
+        "ace_inhibitor",
+        "arb"
+      ],
+      "severity": "severe",
+      "effect": "All of these reduce lithium excretion, so levels can rise to toxicity (tremor, vomiting, confusion, seizures).",
+      "advice": "A lithium level is needed after starting or stopping any of them. Report new tremor, vomiting or confusion urgently."
+    },
+    {
+      "a": "digoxin",
+      "b": [
+        "thiazide",
+        "loop_diuretic",
+        "k_sparing"
+      ],
+      "severity": "moderate",
+      "effect": "Low potassium (from thiazides/loops) makes digoxin toxicity far more likely; potassium-sparing diuretics raise digoxin levels.",
+      "advice": "Have potassium and digoxin levels checked; report nausea, visual halos or palpitations."
+    },
+    {
+      "a": "digoxin",
+      "b": [
+        "ccb_non_dhp",
+        "amiodarone",
+        "macrolide"
+      ],
+      "severity": "severe",
+      "effect": "Raised digoxin levels and additive heart-rate slowing.",
+      "advice": "Monitor for bradycardia and digoxin toxicity."
+    },
+    {
+      "a": "statin",
+      "b": [
+        "fibrate"
+      ],
+      "severity": "moderate",
+      "effect": "Gemfibrozil especially doubles the risk of statin myopathy and rhabdomyolysis.",
+      "advice": "Fenofibrate is the safer pairing; report unexplained muscle pain or dark urine urgently."
+    },
+    {
+      "a": "methotrexate",
+      "b": [
+        "ppi",
+        "trimethoprim",
+        "sulfa",
+        "nsaid"
+      ],
+      "severity": "severe",
+      "effect": "These reduce methotrexate clearance and can cause severe bone-marrow suppression.",
+      "advice": "Only on specialist advice with blood-count monitoring."
+    },
+    {
+      "a": "carbamazepine",
+      "b": [
+        "macrolide",
+        "azole",
+        "diltiazem",
+        "verapamil"
+      ],
+      "severity": "severe",
+      "effect": "Carbamazepine levels rise into the toxic range (dizziness, double vision, ataxia).",
+      "advice": "Avoid or use a different antibiotic/antifungal; a level check is needed."
+    },
+    {
+      "a": "valproate",
+      "b": [
+        "carbamazepine",
+        "lamotrigine",
+        "methotrexate"
+      ],
+      "severity": "moderate",
+      "effect": "Levels of one or both drugs change; liver toxicity and rash risk rise.",
+      "advice": "Specialist monitoring required."
+    },
+    {
+      "a": "immunosuppressant",
+      "b": [
+        "nsaid",
+        "ace_inhibitor",
+        "arb",
+        "statin",
+        "potassium"
+      ],
+      "severity": "severe",
+      "effect": "Calcineurin inhibitors are nephrotoxic; adding NSAIDs, renin–angiotensin drugs or potassium sharply raises kidney injury and hyperkalaemia risk.",
+      "advice": "Transplant team decision only — do not start anything new without them."
+    },
+    {
+      "a": "azole",
+      "b": [
+        "statin",
+        "warfarin",
+        "carbamazepine"
+      ],
+      "severity": "severe",
+      "effect": "Azole antifungals block CYP3A4, raising levels of these drugs (muscle toxicity, bleeding, carbamazepine toxicity).",
+      "advice": "Prefer fluconazole (weaker effect) or a dose change agreed with your doctor."
+    },
+    {
+      "a": "allopurinol",
+      "b": [
+        "azathioprine",
+        "mercaptopurine"
+      ],
+      "severity": "severe",
+      "effect": "Allopurinol blocks the enzyme that clears these chemotherapy/immunosuppressant drugs, causing life-threatening marrow suppression.",
+      "advice": "The dose must be reduced to about 25% or the drugs stopped — contact your prescriber immediately."
+    },
+    {
+      "a": "salbutamol",
+      "b": [
+        "beta_blocker"
+      ],
+      "severity": "moderate",
+      "effect": "Non-selective beta blockers can block salbutamol's effect and trigger bronchospasm in asthma.",
+      "advice": "Cardioselective beta blockers (bisoprolol, metoprolol) are usually fine; carry your reliever and report increased wheeze."
+    },
+    {
+      "a": "nitrate",
+      "b": [
+        "pd5"
+      ],
+      "severity": "severe",
+      "effect": "Combined use can cause a severe, potentially fatal drop in blood pressure (fainting, collapse).",
+      "advice": "Never take PDE5 inhibitors within 24 h of a nitrate (48 h for tadalafil)."
+    },
+    {
+      "a": "ccb_non_dhp",
+      "b": [
+        "beta_blocker"
+      ],
+      "severity": "moderate",
+      "effect": "Additive heart-rate slowing and, with verapamil, risk of heart block and low output.",
+      "advice": "Watch for a pulse under 50, dizziness or breathlessness; your doctor should review the doses."
+    },
+    {
+      "a": "ppi",
+      "b": [
+        "clopidogrel"
+      ],
+      "severity": "severe",
+      "effect": "Omeprazole and esomeprazole block CYP2C19 and reduce clopidogrel's anti-clotting effect — a real risk after a stent or stroke.",
+      "advice": "Switch to pantoprazole, which does not interfere, and tell your cardiologist."
+    },
+    {
+      "a": "potassium",
+      "b": [
+        "ace_inhibitor",
+        "arb",
+        "k_sparing"
+      ],
+      "severity": "severe",
+      "effect": "Hyperkalaemia risk.",
+      "advice": "Avoid self-supplementing; ask for a potassium level first."
+    },
+    {
+      "a": "levothyroxine",
+      "b": [
+        "ppi",
+        "iron",
+        "calcium",
+        "sulfa"
+      ],
+      "severity": "moderate",
+      "effect": "These reduce levothyroxine absorption, so the thyroid dose stops working properly.",
+      "advice": "Separate by at least 4 hours (2 hours from PPIs); take levothyroxine on an empty stomach."
+    },
+    {
+      "a": "iron",
+      "b": [
+        "calcium",
+        "ppi",
+        "tetracycline",
+        "fluoroquinolone"
+      ],
+      "severity": "moderate",
+      "effect": "Mutual reduction of absorption.",
+      "advice": "Space these doses by 2 hours."
+    },
+    {
+      "a": "tramadol",
+      "b": [
+        "ssri",
+        "snri",
+        "tca",
+        "maoi"
+      ],
+      "severity": "severe",
+      "effect": "Serotonin syndrome and reduced seizure threshold.",
+      "advice": "Use only with your prescriber's knowledge and the lowest dose."
+    },
+    {
+      "a": "antihistamine_cns",
+      "b": [
+        "benzodiazepine",
+        "opioid",
+        "z_drug",
+        "alcohol"
+      ],
+      "severity": "moderate",
+      "effect": "Marked sedation, dry mouth, constipation and falls — especially in older adults.",
+      "advice": "Avoid combining with other sedatives; do not drive."
+    },
+    {
+      "a": "steroid",
+      "b": [
+        "nsaid",
+        "antiplatelet",
+        "warfarin"
+      ],
+      "severity": "moderate",
+      "effect": "Steroids irritate the gut and, with anticoagulants/antiplatelets, raise the risk of ulcer bleeding.",
+      "advice": "Take with food; ask whether a stomach protector is needed during a steroid course."
+    },
+    {
+      "a": "steroid",
+      "b": [
+        "ssri"
+      ],
+      "severity": "mild",
+      "effect": "Additive risk of low bone density with long-term use.",
+      "advice": "Not an emergency — mention it at your next review for vitamin D and bone protection."
+    }
+  ],
+  "triple_whammy": {
+    "requires": [
+      "nsaid",
+      [
+        "ace_inhibitor",
+        "arb"
+      ],
+      [
+        "loop_diuretic",
+        "thiazide"
+      ]
+    ],
+    "severity": "severe",
+    "effect": "Triple whammy: NSAID + ACE inhibitor/ARB + diuretic together sharply raises the risk of acute kidney injury.",
+    "advice": "Stop the NSAID if you can and contact your doctor; keep well hydrated and ask for kidney function, sodium and potassium checks."
+  },
+  "food": [
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Grapefruit blocks the enzyme that breaks down these medicines, so blood levels can rise. Avoid grapefruit and its juice while taking them.",
+      "timing": "If you cannot avoid it, keep it to small, occasional amounts and never drink grapefruit juice with the dose.",
+      "with": [
+        "grapefruit",
+        "grapefruit juice",
+        "pomelo",
+        "seville orange"
+      ],
+      "drugs": [
+        "statin",
+        "ccb_dihydropyridine",
+        "ciclosporin",
+        "tacrolimus",
+        "beta_blocker",
+        "bisoprolol"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "severe",
+      "tip": "Grapefruit juice can markedly raise the level of these tablets — with statins that means more muscle pain risk, with calcium channel blockers more ankle swelling and low blood pressure.",
+      "timing": "Choose a different fruit while on these medicines.",
+      "with": [
+        "grapefruit",
+        "grapefruit juice"
+      ],
+      "drugs": [
+        "simvastatin",
+        "atorvastatin",
+        "lovastatin",
+        "amlodipine",
+        "felodipine",
+        "nifedipine"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Alcohol adds to stomach irritation, bleeding risk, sedation and — with metformin or high paracetamol doses — lactic acid or liver injury.",
+      "timing": "Keep within low-risk limits and never binge; take NSAIDs with food, not with a drink.",
+      "with": [
+        "alcohol"
+      ],
+      "drugs": [
+        "nsaid",
+        "warfarin",
+        "doac",
+        "benzodiazepine",
+        "opioid",
+        "ssri",
+        "metformin",
+        "paracetamol"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Spinach, kale, broccoli, cabbage and green tea contain vitamin K, which counteracts warfarin. Sudden changes in how much you eat make the INR swing.",
+      "timing": "Eat a steady amount every week rather than avoiding these foods altogether; keep the dose at the same time each day.",
+      "with": [
+        "vitamin k rich food"
+      ],
+      "drugs": [
+        "warfarin"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "These can add to warfarin's effect and raise the INR.",
+      "timing": "Avoid large or regular amounts and tell your anticoagulation clinic what you take.",
+      "with": [
+        "cranberry",
+        "ginger",
+        "ginseng",
+        "garlic supplements",
+        "turmeric supplements"
+      ],
+      "drugs": [
+        "warfarin"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Calcium, magnesium and iron bind these antibiotics and bone tablets so almost nothing is absorbed.",
+      "timing": "Take the antibiotic 2 hours before or 4–6 hours after dairy, antacids or supplements; bone tablets need plain water only.",
+      "with": [
+        "dairy",
+        "milk",
+        "yoghurt",
+        "cheese",
+        "antacid",
+        "calcium",
+        "iron",
+        "soy"
+      ],
+      "drugs": [
+        "tetracycline",
+        "fluoroquinolone",
+        "bisphosphonate"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "These reduce absorption of your thyroid hormone or iron dose.",
+      "timing": "Take levothyroxine with water 30–60 minutes before breakfast and keep 4 hours between it and calcium/iron.",
+      "with": [
+        "dairy",
+        "milk",
+        "yoghurt",
+        "cheese",
+        "antacid",
+        "calcium"
+      ],
+      "drugs": [
+        "levothyroxine",
+        "iron",
+        "thyroxine"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Tannins and calcium block iron absorption — a common reason tablets 'do not work'.",
+      "timing": "Take iron with a glass of orange juice (vitamin C helps) and keep 2 hours clear of tea, coffee and dairy.",
+      "with": [
+        "tea",
+        "coffee",
+        "red wine",
+        "wholegrain",
+        "bran",
+        "milk"
+      ],
+      "drugs": [
+        "iron",
+        "ferrous sulfate",
+        "ferrous fumarate",
+        "ferrous gluconate"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "A protein-heavy meal competes with levodopa and can make the dose feel less effective.",
+      "timing": "Take levodopa 30–60 minutes before the meal, or as your neurologist advises.",
+      "with": [
+        "protein rich meal",
+        "meat",
+        "eggs",
+        "dairy"
+      ],
+      "drugs": [
+        "levodopa",
+        "benserazide",
+        "carbidopa"
+      ]
+    },
+    {
+      "tyramine": true,
+      "rule": "avoid",
+      "severity": "severe",
+      "tip": "These are high in tyramine and can trigger a hypertensive crisis with MAOIs — a sudden, severe headache and very high blood pressure.",
+      "timing": "Avoid all tyramine-rich foods for the whole course and for 2 weeks after stopping.",
+      "with": [
+        "mature cheese",
+        "yeast extract",
+        "red wine",
+        "cured meat",
+        "sauerkraut",
+        "beer"
+      ],
+      "drugs": [
+        "maoi"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "severe",
+      "tip": "Linezolid is a weak MAO inhibitor: beer, wine, cheese and cured meats can cause a hypertensive crisis.",
+      "timing": "Avoid these foods for the whole antibiotic course.",
+      "with": [
+        "alcohol",
+        "tyramine rich food"
+      ],
+      "drugs": [
+        "linezolid"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "mild",
+      "tip": "Very high fibre can carry the dose through before it is absorbed.",
+      "timing": "Take on an empty stomach and separate from high-fibre meals by 2 hours.",
+      "with": [
+        "high fibre food",
+        "bran",
+        "psyllium"
+      ],
+      "drugs": [
+        "digoxin",
+        "levothyroxine"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "severe",
+      "tip": "Levels of these transplant/immune medicines can rise sharply, risking kidney injury.",
+      "timing": "Avoid grapefruit entirely; the transplant team should be told.",
+      "with": [
+        "grapefruit juice"
+      ],
+      "drugs": [
+        "ciclosporin",
+        "tacrolimus",
+        "sirolimus"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Licorice (real, from Glycyrrhiza) raises blood pressure and lowers potassium, working against your tablets and aggravating digoxin.",
+      "timing": "Avoid sweets, tea and supplements containing real licorice root.",
+      "with": [
+        "licorice"
+      ],
+      "drugs": [
+        "thiazide",
+        "loop_diuretic",
+        "digoxin",
+        "beta_blocker"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Extra dietary potassium on top of these medicines can push potassium into a dangerous range.",
+      "timing": "Do not take potassium salts or 'low-sodium' salt substitutes without a blood test.",
+      "with": [
+        "potassium rich food",
+        "bananas",
+        "oranges",
+        "potatoes",
+        "salt substitute"
+      ],
+      "drugs": [
+        "k_sparing",
+        "ace_inhibitor",
+        "arb",
+        "potassium"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Grapefruit juice can raise opioid levels and sedation.",
+      "timing": "Avoid grapefruit juice entirely.",
+      "with": [
+        "grapefruit juice"
+      ],
+      "drugs": [
+        "methadone",
+        "buprenorphine"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "severe",
+      "tip": "Alcohol plus metformin increases the risk of lactic acidosis, especially with liver or kidney problems or dehydration.",
+      "timing": "Avoid binge drinking and never drink around the time of an overdose or illness.",
+      "with": [
+        "alcohol"
+      ],
+      "drugs": [
+        "metformin",
+        "biguanide"
+      ]
+    },
+    {
+      "rule": "with",
+      "severity": "severe",
+      "tip": "These lower blood sugar — skipping the meal that goes with the dose can cause a hypoglycaemic episode (shaking, sweating, confusion).",
+      "timing": "Always take with a meal; keep a fast-acting sugar (glucose tablets, juice) to hand and never skip a dose on an empty stomach.",
+      "with": [
+        "meal"
+      ],
+      "drugs": [
+        "sulfonylurea",
+        "gliclazide",
+        "glibenclamide",
+        "glimepiride",
+        "insulin"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Raised antibiotic levels can mean more nausea, cramps and, rarely, QT effects.",
+      "timing": "Avoid grapefruit for the course.",
+      "with": [
+        "grapefruit juice"
+      ],
+      "drugs": [
+        "erythromycin",
+        "clarithromycin",
+        "irinotecan"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Caffeine adds to theophylline's stimulant effect: palpitations, tremor and insomnia.",
+      "timing": "Cut down coffee, tea and energy drinks while on theophylline.",
+      "with": [
+        "hot drink",
+        "caffeine"
+      ],
+      "drugs": [
+        "theophylline",
+        "aminophylline"
+      ]
+    },
+    {
+      "rule": "avoid",
+      "severity": "moderate",
+      "tip": "Food makes bone tablets almost useless and worsens oesophageal irritation.",
+      "timing": "First thing in the morning with a full glass of plain water, stay upright for 30 minutes and eat nothing for 30 minutes.",
+      "with": [
+        "food"
+      ],
+      "drugs": [
+        "bisphosphonate",
+        "alendronate",
+        "risedronate"
+      ]
+    },
+    {
+      "rule": "with",
+      "severity": "mild",
+      "tip": "They work best before the first meal of the day.",
+      "timing": "Take 30–60 minutes before breakfast on an empty stomach.",
+      "with": [
+        "food"
+      ],
+      "drugs": [
+        "ppi",
+        "omeprazole",
+        "esomeprazole",
+        "pantoprazole"
+      ]
+    },
+    {
+      "rule": "with",
+      "severity": "moderate",
+      "tip": "Food reduces direct stomach irritation, though it does not remove the ulcer risk.",
+      "timing": "Take with or just after food, at the lowest dose that works.",
+      "with": [
+        "food"
+      ],
+      "drugs": [
+        "nsaid",
+        "ibuprofen",
+        "diclofenac",
+        "naproxen"
+      ]
+    },
+    {
+      "rule": "with",
+      "severity": "moderate",
+      "tip": "An empty stomach gives better absorption but more nausea and oesophageal ulcer risk.",
+      "timing": "Take with a full glass of water, stay upright 30 minutes, and keep dairy 2 hours away.",
+      "with": [
+        "food"
+      ],
+      "drugs": [
+        "doxycycline",
+        "tetracycline"
+      ]
+    }
+  ],
+  "pregnancy": [
+    {
+      "drugs": [
+        "ace_inhibitor",
+        "arb"
+      ],
+      "when": "pregnant",
+      "risk": "contraindicated",
+      "note": "Risk of fetal kidney injury, low amniotic fluid and death — especially in the second and third trimesters.",
+      "alternative": "Labetalol, nifedipine or methyldopa are the usual blood-pressure choices in pregnancy."
+    },
+    {
+      "drugs": [
+        "warfarin"
+      ],
+      "when": "pregnant",
+      "risk": "contraindicated",
+      "note": "Crosses the placenta and causes warfarin embryopathy and fetal bleeding.",
+      "alternative": "Low-molecular-weight heparin (enoxaparin) — prescribed and monitored by the anticoagulation team."
+    },
+    {
+      "drugs": [
+        "methotrexate"
+      ],
+      "when": "both",
+      "risk": "contraindicated",
+      "note": "A well-established cause of miscarriage and birth defects.",
+      "alternative": "Stop before conception and for at least one ovulatory/menstrual cycle; discuss alternatives with your rheumatologist."
+    },
+    {
+      "drugs": [
+        "isotretinoin",
+        "acitretin",
+        "tretinoin"
+      ],
+      "when": "pregnant",
+      "risk": "contraindicated",
+      "note": "Severe teratogenicity.",
+      "alternative": "Topical azelaic acid or benzoyl peroxide; obstetric-supervised antibiotics if needed."
+    },
+    {
+      "drugs": [
+        "valproate",
+        "sodium valproate"
+      ],
+      "when": "both",
+      "risk": "contraindicated",
+      "note": "Up to 10% risk of neural tube defects and serious neurodevelopmental harm.",
+      "alternative": "Switch to levetiracetam or lamotrigine with a neurologist before planning pregnancy."
+    },
+    {
+      "drugs": [
+        "statin",
+        "atorvastatin",
+        "simvastatin",
+        "rosuvastatin"
+      ],
+      "when": "both",
+      "risk": "avoid",
+      "note": "No proven benefit in pregnancy and theoretical harm to fetal cholesterol synthesis.",
+      "alternative": "Stop statins during pregnancy; diet and, if needed, bile-acid sequestrants."
+    },
+    {
+      "drugs": [
+        "tetracycline",
+        "doxycycline"
+      ],
+      "when": "both",
+      "risk": "avoid",
+      "note": "Teeth staining and bone effects after 15 weeks; liver risk in the mother.",
+      "alternative": "Amoxicillin, cefuroxime or nitrofurantoin (short course) under obstetric guidance."
+    },
+    {
+      "drugs": [
+        "fluoroquinolone",
+        "ciprofloxacin",
+        "levofloxacin"
+      ],
+      "when": "both",
+      "risk": "avoid",
+      "note": "Cartilage toxicity seen in animal studies.",
+      "alternative": "A beta-lactam antibiotic (amoxicillin, cefuroxime) instead."
+    },
+    {
+      "drugs": [
+        "macrolide",
+        "erythromycin"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Erythromycin estolate is associated with maternal liver effects; QT concerns with clarithromycin.",
+      "alternative": "Azithromycin or amoxicillin are generally preferred."
+    },
+    {
+      "drugs": [
+        "ssri",
+        "fluoxetine",
+        "paroxetine"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Paroxetine is associated with cardiac malformations; SSRIs near term can cause neonatal adaptation syndrome.",
+      "alternative": "Sertraline is usually considered the preferred SSRI in pregnancy; never stop abruptly."
+    },
+    {
+      "drugs": [
+        "nsaid",
+        "ibuprofen",
+        "diclofenac",
+        "naproxen"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Avoid after 20 weeks (oligohydramnios, ductus arteriosus closure) and in the third trimester.",
+      "alternative": "Paracetamol is the standard pain relief in pregnancy."
+    },
+    {
+      "drugs": [
+        "nsaid",
+        "ibuprofen",
+        "diclofenac",
+        "naproxen"
+      ],
+      "when": "breastfeeding",
+      "risk": "caution",
+      "note": "Small amounts pass into milk; short courses at normal doses are generally acceptable.",
+      "alternative": "Paracetamol or ibuprofen for the shortest time; avoid indomethacin."
+    },
+    {
+      "drugs": [
+        "theophylline"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Narrow therapeutic index — levels fall in late pregnancy and toxicity is dangerous.",
+      "alternative": "Continue but with level monitoring; salbutamol inhaler as reliever."
+    },
+    {
+      "drugs": [
+        "carbamazepine"
+      ],
+      "when": "both",
+      "risk": "caution",
+      "note": "Neural tube defects and neurodevelopmental effects.",
+      "alternative": "Higher-dose folic acid and specialist supervision, or a switch before conception."
+    },
+    {
+      "drugs": [
+        "lithium"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Ebstein's anomaly risk, highest in the first trimester; neonatal toxicity near term.",
+      "alternative": "Often continued with dose adjustment and level monitoring if the risk of relapse is high."
+    },
+    {
+      "drugs": [
+        "benzodiazepine",
+        "diazepam"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Neonatal floppy syndrome and withdrawal if used late in pregnancy.",
+      "alternative": "Non-drug sleep strategies; the lowest dose for the shortest time."
+    },
+    {
+      "drugs": [
+        "benzodiazepine",
+        "diazepam",
+        "midazolam"
+      ],
+      "when": "breastfeeding",
+      "risk": "caution",
+      "note": "Passes into milk and accumulates in a newborn.",
+      "alternative": "Short-acting agents (lorazepam, oxazepam) and expressed milk timing if treatment is unavoidable."
+    },
+    {
+      "drugs": [
+        "opioid",
+        "codeine",
+        "morphine"
+      ],
+      "when": "breastfeeding",
+      "risk": "caution",
+      "note": "Codeine and tramadol are converted to morphine; a CYP2D6 ultrarapid metaboliser can cause a dangerous dose in the baby.",
+      "alternative": "Paracetamol or ibuprofen preferred; avoid routine codeine/tramadol while breastfeeding."
+    },
+    {
+      "drugs": [
+        "tramadol"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Neonatal withdrawal and serotonin effects reported.",
+      "alternative": "Paracetamol; specialist analgesia if stronger relief is needed."
+    },
+    {
+      "drugs": [
+        "biguanide",
+        "metformin"
+      ],
+      "when": "pregnant",
+      "risk": "usually acceptable",
+      "note": "Widely used in gestational diabetes with a good safety record.",
+      "alternative": "Continue or start under obstetric diabetic care; insulin is the fallback."
+    },
+    {
+      "drugs": [
+        "levothyroxine"
+      ],
+      "when": "both",
+      "risk": "usually acceptable",
+      "note": "Thyroid hormone is the same as the body makes — untreated hypothyroidism is the real danger.",
+      "alternative": "Continue; the dose usually rises in pregnancy and needs a TSH check."
+    },
+    {
+      "drugs": [
+        "beta_blocker",
+        "labetalol",
+        "metoprolol"
+      ],
+      "when": "pregnant",
+      "risk": "usually acceptable",
+      "note": "Labetalol, metoprolol and nifedipine are the preferred antihypertensives; atenolol is avoided.",
+      "alternative": "Labetalol is first line."
+    },
+    {
+      "drugs": [
+        "ccb_dihydropyridine",
+        "nifedipine",
+        "amlodipine"
+      ],
+      "when": "pregnant",
+      "risk": "usually acceptable",
+      "note": "Nifedipine is commonly used for hypertension in pregnancy; amlodipine has limited but reassuring data.",
+      "alternative": "Confirm with your obstetrician."
+    },
+    {
+      "drugs": [
+        "biguanide",
+        "metformin",
+        "glibenclamide"
+      ],
+      "when": "breastfeeding",
+      "risk": "usually acceptable",
+      "note": "Both are considered compatible with breastfeeding.",
+      "alternative": "Monitor the infant's blood sugar if used in the first days."
+    },
+    {
+      "drugs": [
+        "ppi",
+        "omeprazole",
+        "pantoprazole"
+      ],
+      "when": "both",
+      "risk": "usually acceptable",
+      "note": "Omeprazole and pantoprazole have the largest reassuring datasets.",
+      "alternative": "Prefer omeprazole/pantoprazole over others if a choice exists."
+    },
+    {
+      "drugs": [
+        "paracetamol"
+      ],
+      "when": "both",
+      "risk": "usually acceptable",
+      "note": "The standard pain and fever relief in pregnancy and breastfeeding.",
+      "alternative": "Use the lowest effective dose for the shortest time."
+    },
+    {
+      "drugs": [
+        "salbutamol"
+      ],
+      "when": "both",
+      "risk": "usually acceptable",
+      "note": "Inhaled relievers keep oxygen levels safe for the baby.",
+      "alternative": "Never stop asthma treatment in pregnancy — poor control is riskier than the inhaler."
+    },
+    {
+      "drugs": [
+        "levothyroxine",
+        "iron",
+        "folic acid",
+        "calcium"
+      ],
+      "when": "both",
+      "risk": "usually acceptable",
+      "note": "Standard pregnancy supplements.",
+      "alternative": "Folic acid 400–500 µg daily before and in early pregnancy."
+    },
+    {
+      "drugs": [
+        "ocp",
+        "ethinylestradiol",
+        "levonorgestrel"
+      ],
+      "when": "pregnant",
+      "risk": "avoid",
+      "note": "Not needed in pregnancy; combined pills are not used while pregnant.",
+      "alternative": "Stop; discuss postpartum contraception (progestogen-only or intrauterine methods are breastfeeding-compatible)."
+    },
+    {
+      "drugs": [
+        "allopurinol"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Limited data; usually stopped unless gout is severe.",
+      "alternative": "Colchicine (low dose) is often preferred under specialist care."
+    },
+    {
+      "drugs": [
+        "azole",
+        "fluconazole"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "High-dose fluconazole is associated with skeletal and cardiac anomalies; a single dose for thrush is generally considered acceptable.",
+      "alternative": "Topical imidazole pessaries preferred for vaginal candidiasis."
+    },
+    {
+      "drugs": [
+        "immunosuppressant",
+        "methotrexate",
+        "mycophenolate"
+      ],
+      "when": "breastfeeding",
+      "risk": "contraindicated",
+      "note": "Passes into milk with marrow-suppressive effects.",
+      "alternative": "Discuss with your transplant/autoimmune team before breastfeeding."
+    },
+    {
+      "drugs": [
+        "benzodiazepine",
+        "alprazolam"
+      ],
+      "when": "pregnant",
+      "risk": "caution",
+      "note": "Risk of neonatal withdrawal.",
+      "alternative": "Non-drug measures first; specialist review if continuing."
+    }
+  ],
+  "meal_timing": {
+    "by_class": {
+      "levothyroxine": "30–60 minutes before breakfast, with plain water. Keep 4 hours clear of calcium, iron, PPIs and dairy.",
+      "bisphosphonate": "First thing in the morning on an empty stomach with a full glass of plain water. Stay upright for 30 minutes and eat nothing for 30 minutes.",
+      "ppi": "30–60 minutes before the first meal of the day.",
+      "nsaid": "With or just after food to reduce stomach irritation.",
+      "iron": "With vitamin C (orange juice) and away from tea, coffee, dairy and antacids by 2 hours.",
+      "tetracycline": "2 hours before or 4–6 hours after dairy, antacids, calcium or iron. Do not lie down for 30 minutes.",
+      "fluoroquinolone": "2 hours before or 4–6 hours after dairy, antacids, calcium, iron or zinc. Keep well hydrated.",
+      "sulfonylurea": "With a meal — never on an empty stomach. Keep fast-acting sugar nearby.",
+      "insulin": "Match the dose to the meal; do not eat less than planned after injecting.",
+      "biguanide": "With or just after a meal to limit stomach upset.",
+      "warfarin": "Same time every day, with a steady weekly amount of vitamin K rich food.",
+      "statin": "Evening or night for simvastatin/pravastatin (the enzyme is most active then); any consistent time for atorvastatin. Avoid grapefruit.",
+      "potassium": "With food and a full glass of water to avoid stomach irritation.",
+      "digoxin": "At the same time each day; avoid very high-fibre meals at the dose time.",
+      "theophylline": "With food to reduce nausea; cut down caffeine.",
+      "macrolide": "With food if it upsets the stomach; keep 2 hours from antacids.",
+      "beta_blocker": "With or without food — but take it at the same time each day.",
+      "ace_inhibitor": "With or without food, at the same time each day; avoid salt substitutes.",
+      "nitrate": "Isosorbide mononitrate: in the morning with food; leave a 10–12 hour nitrate-free gap overnight if prescribed.",
+      "ocp": "At the same time every day; with food if it upsets the stomach.",
+      "carbamazepine": "With food and plenty of water; never change brands without a level check.",
+      "valproate": "With food to limit nausea.",
+      "ssri": "With food if it causes nausea; paroxetine in the morning, others flexible.",
+      "tramadol": "With food to reduce nausea; never with alcohol.",
+      "z_drug": "Just before bed, only when you can have a full night's sleep.",
+      "steroid": "With food or milk; a single morning dose matches the body's own rhythm.",
+      "salbutamol": "Rinse the mouth after an inhaled steroid; reliever can be taken with or without food."
+    },
+    "by_drug": {
+      "methotrexate": "Once weekly, on the same day, with food and a full glass of water. Never take it daily.",
+      "levodopa": "30–60 minutes before a meal, or as directed — a heavy protein meal blunts the effect.",
+      "linezolid": "With or without food; avoid tyramine-rich food and alcohol.",
+      "nitrofurantoin": "With food to improve absorption and reduce nausea; keep well hydrated.",
+      "doxycycline": "With a full glass of water, upright for 30 minutes, 2 hours away from dairy and antacids.",
+      "alendronate": "Empty stomach, plain water only, upright 30 minutes.",
+      "paracetamol": "Can be taken with or without food; never exceed the labelled daily maximum.",
+      "aspirin": "With food and a full glass of water.",
+      "clindamycin": "With a full glass of water, do not lie down for 30 minutes.",
+      "prednisolone": "With breakfast or after food to protect the stomach."
+    }
+  },
+  "missed_dose": {
+    "default": "Take it as soon as you remember, unless it is almost time for the next dose — then skip it and take the next dose at its normal time. Never take two doses together to catch up.",
+    "as_needed": "This is a medicine you take only when needed, so there is nothing to catch up on. Take it only as directed for the episode.",
+    "weekly": "Never take it on the wrong day to 'catch up'. Wait and take it on your usual day, then carry on as normal. If you are unsure, ask your pharmacist.",
+    "by_class": {
+      "warfarin": "Take it as soon as you remember on the same day. If you only remember the next day, skip the missed dose and resume your usual dose — never double. Call your anticoagulation clinic if you miss two days in a row, and report any unusual bruising or bleeding.",
+      "doac": "Take as soon as you remember on the same day. If it is already the next day, skip it and carry on at the usual time. Never double up — these are fixed-dose and doubling raises bleeding risk.",
+      "antiplatelet": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double. If you have missed doses after a stent or stroke, contact your cardiology team.",
+      "sulfonylurea": "Take it with the next meal as soon as you remember. If it is almost time for the next dose, skip it — never double, and do not skip the meal that goes with it. Watch for low blood sugar: shaking, sweating, confusion. Treat it with glucose tablets or juice and check your sugar.",
+      "insulin": "If it is less than 2 hours before your next meal, skip the missed dose. Never double insulin — it can cause severe hypoglycaemia. Check your blood sugar and keep fast-acting sugar nearby.",
+      "biguanide": "Take as soon as remembered with food. If it is nearly time for the next dose, skip it. Do not double, and stop metformin temporarily and call your doctor if you become dehydrated, very thirsty or develop fast breathing.",
+      "levothyroxine": "If you remember within 3–4 hours, take it on an empty stomach. Otherwise skip it and take the next dose as normal. Never double — thyroid levels take days to change, so one missed dose is not an emergency.",
+      "lithium": "Take it as soon as you remember unless it is nearly the next dose; then skip it. Never double. Missing doses repeatedly (or becoming dehydrated) can cause toxicity: tremor, vomiting, confusion, unsteady walking — seek urgent care. Tell your doctor and ask for a level.",
+      "digoxin": "Take it as soon as remembered if it is less than halfway to the next dose; otherwise skip it. Never double. Report nausea, loss of appetite, visual halos or a slow/irregular pulse urgently.",
+      "methotrexate": "Never take a missed weekly dose on another day. Skip it and take the next dose on your usual weekly day. If you are unsure, contact the clinic the same day.",
+      "steroid": "Never stop a steroid course suddenly. Take the missed dose as soon as you remember, then carry on. If you have missed more than one dose in a day, contact your doctor — dose adjustment may be needed.",
+      "ocp": "Take it as soon as you remember and the next one at the usual time (you may take two in one day). If you are more than 12 hours late, use condoms for 7 days and follow the leaflet's day-by-day rule — progestogen-only pills need backup after 3 hours. Seek advice if the pattern repeats.",
+      "bisphosphonate": "If you remember the same week, take it that morning as usual. Otherwise skip it and restart on your next scheduled weekly day — never take two in one week.",
+      "ssri": "Take it as soon as remembered; if it is nearly the next dose, skip it. Never double. Stopping abruptly can cause dizziness, electric-shock sensations and irritability — talk to your doctor before any change.",
+      "benzodiazepine": "Take only as prescribed; if you miss a dose, skip it and never double. Do not take an extra dose to make up for anxiety — discuss a plan with your prescriber.",
+      "z_drug": "Skip it unless you are sure you can have a full night's sleep. Never take a second dose in the same night.",
+      "amiodarone": "Take it as soon as remembered; if it is nearly the next dose, skip it. Never double — amiodarone stays in the body for weeks, so a single missed dose matters little, but repeated misses affect the heart rhythm.",
+      "beta_blocker": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double. Do not stop suddenly — abrupt withdrawal can cause a rebound rise in blood pressure or heart rate and angina.",
+      "ace_inhibitor": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double. Stopping suddenly is usually less harmful than overdosing, but tell your doctor if you keep missing doses.",
+      "arb": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double. Do not stop without advice if you are on it for heart failure.",
+      "theophylline": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double — the range between a working dose and a toxic one is narrow.",
+      "carbamazepine": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double. Missing doses causes breakthrough seizures; if you miss two days, contact your neurologist.",
+      "valproate": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double. Repeated misses can cause breakthrough seizures or mood swings.",
+      "potassium": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double — too much potassium affects the heart rhythm.",
+      "tramadol": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double, and never combine with alcohol or sedatives.",
+      "antihistamine_cns": "Take as soon as remembered; if it is nearly the next dose, skip it. Never double — extra doses cause severe drowsiness and dry mouth."
+    },
+    "by_drug": {
+      "methotrexate": "Never take a missed weekly dose on another day.",
+      "alendronate": "Skip until your next scheduled weekly morning.",
+      "levothyroxine": "Skip rather than double; take the next dose as normal."
+    }
+  },
+  "duplicate": {
+    "same_generic": "severe",
+    "same_class_pairs": {
+      "ace_inhibitor": "severe",
+      "arb": "severe",
+      "statin": "moderate",
+      "ppi": "moderate",
+      "ssri": "moderate",
+      "nsaid": "moderate",
+      "cox2": "moderate",
+      "loop_diuretic": "moderate",
+      "thiazide": "moderate",
+      "beta_blocker": "moderate",
+      "ccb_dihydropyridine": "moderate",
+      "benzodiazepine": "severe",
+      "z_drug": "moderate",
+      "doac": "severe",
+      "warfarin": "severe",
+      "antiplatelet": "moderate",
+      "antihistamine_cns": "moderate",
+      "opioid": "severe",
+      "tramadol": "severe",
+      "sulfonylurea": "moderate",
+      "biguanide": "moderate",
+      "dpp4": "moderate",
+      "sglt2": "moderate",
+      "tca": "moderate",
+      "snri": "moderate",
+      "k_sparing": "moderate",
+      "iron": "moderate",
+      "calcium": "mild"
+    }
+  }
+}

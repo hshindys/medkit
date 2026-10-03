@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Commons
 import qs.Ui
+import "views"
 
 // The MedKit panel: what is due, in the window of the day it belongs to.
 //
@@ -32,6 +33,20 @@ Panel {
     if (hour >= 5 && hour < 12) return "morning"
     return "morning"
   }
+
+  // Which half of the panel is in front of you: the doses of the day, or the
+  // safety / health / report / emergency-card views fed by payload.health.
+  property string view: "doses"
+
+  readonly property var viewList: [
+    { id: "doses", label: "Doses", color: "#3b82f6", badge: 0 },
+    { id: "safety", label: "Safety", color: "#ef4444", badge: root.safetyCount() },
+    { id: "health", label: "Health", color: "#22c55e", badge: 0 },
+    { id: "reports", label: "Reports", color: "#a78bfa", badge: 0 },
+    { id: "card", label: "Card", color: "#f59e0b", badge: root.cardBadge() }
+  ]
+
+  readonly property var health: root.payload.health || ({})
 
   readonly property var barIdentity: hostWidget || root
   readonly property var host: hostWidget
@@ -123,6 +138,30 @@ Panel {
     root.tab = ids[(index + step + ids.length) % ids.length]
   }
 
+  function cycleView(step) {
+    var ids = []
+    for (var i = 0; i < root.viewList.length; i++) ids.push(root.viewList[i].id)
+    var index = ids.indexOf(root.view)
+    if (index < 0) index = 0
+    root.view = ids[(index + step + ids.length) % ids.length]
+  }
+
+  function safetyCount() {
+    var found = root.health.interactions
+    var count = found ? Number(found.count || 0) : 0
+    var pregnancy = root.health.pregnancy
+    if (pregnancy && pregnancy.active) count += Number(pregnancy.countFlagged || 0)
+    var repeats = root.health.sideEffects
+    if (repeats) count += (repeats.repeats || []).length
+    return count
+  }
+
+  function cardBadge() {
+    var card = root.health.emergency
+    if (!card || !card.incomplete) return 0
+    return 1
+  }
+
   function open() {
     root.controller.show()
     Qt.callLater(function() {
@@ -142,8 +181,17 @@ Panel {
 
   // Kept so the bar's panel routing matches every other plugin's contract.
   function switchPanel(direction) {
+    if (root.view !== "doses") {
+      cycleView(direction)
+      return false
+    }
     cycleTab(direction)
     return false
+  }
+
+  function openView(name) {
+    root.view = name
+    open()
   }
 
   function setCenterHoverRevealSuppressed(value) {
@@ -179,15 +227,23 @@ Panel {
       onActivateRequested: root.takeNext()
       onTextKey: function(t) {
         var key = t.toLowerCase()
-        if (key === "1") root.tab = "morning"
-        else if (key === "2") root.tab = "evening"
-        else if (key === "3") root.tab = "night"
-        else if (key === "4") root.tab = "emergency"
+        if (key === "1" || key === "2" || key === "3" || key === "4") {
+          root.view = "doses"
+          if (key === "1") root.tab = "morning"
+          else if (key === "2") root.tab = "evening"
+          else if (key === "3") root.tab = "night"
+          else if (key === "4") root.tab = "emergency"
+        }
+        else if (key === "5") root.view = "safety"
+        else if (key === "6") root.view = "health"
+        else if (key === "7") root.view = "reports"
+        else if (key === "8") root.view = "card"
         else if (key === "t") root.takeNext()
         else if (key === "r") if (root.host) root.host.refresh()
         else if (key === "e") if (root.host) root.host.openDashboard()
         else if (key === "a") if (root.host) root.host.addMedicine()
         else if (key === "f") if (root.host) root.host.refill("")
+        else if (key === "c") if (root.host) root.host.showEmergency()
       }
 
       Flickable {
@@ -379,10 +435,23 @@ Panel {
 
           PanelSeparator { foreground: root.contentForeground }
 
+          // ---- Which half of the panel. -------------------------------
+          ViewSwitcher {
+            width: parent.width
+            model: root.viewList
+            current: root.view
+            foreground: root.contentForeground
+            fontFamily: root.contentFontFamily
+            onChosen: function(id) { root.view = id }
+          }
+
+          PanelSeparator { foreground: root.contentForeground }
+
           // ---- The four windows of the day. ----------------------------
           Row {
             id: tabRow
             width: parent.width
+            visible: root.view === "doses"
             spacing: Style.space(6)
 
             Repeater {
@@ -478,13 +547,14 @@ Panel {
 
           // ---- What this window holds. ---------------------------------
           PanelSectionHeader {
+            visible: root.view === "doses"
             text: tabHeading()
             foreground: root.contentForeground
             fontFamily: root.contentFontFamily
           }
 
           Text {
-            visible: root.tab === "emergency" && root.tabDoses.length > 0
+            visible: root.view === "doses" && root.tab === "emergency" && root.tabDoses.length > 0
             width: parent.width
             textFormat: Text.PlainText
             text: "As-needed and every-N-days medicines live here, whatever the hour."
@@ -495,6 +565,7 @@ Panel {
 
           Column {
             width: parent.width
+            visible: root.view === "doses"
             spacing: Style.space(9)
 
             Repeater {
@@ -512,7 +583,7 @@ Panel {
           }
 
           Text {
-            visible: root.tabDoses.length === 0
+            visible: root.view === "doses" && root.tabDoses.length === 0
             width: parent.width
             wrapMode: Text.WordWrap
             textFormat: Text.PlainText
@@ -528,7 +599,7 @@ Panel {
           Column {
             width: parent.width
             spacing: Style.space(9)
-            visible: root.lowMedicines.length > 0
+            visible: root.view === "doses" && root.lowMedicines.length > 0
 
             PanelSeparator { foreground: root.contentForeground }
 
@@ -626,6 +697,56 @@ Panel {
             }
           }
 
+          // ---- The safety, health, report and card views. --------------
+          SafetyView {
+            width: parent.width
+            visible: root.view === "safety"
+            health: root.health
+            host: root.host
+            foreground: root.contentForeground
+            fontFamily: root.contentFontFamily
+          }
+
+          HealthView {
+            width: parent.width
+            visible: root.view === "health"
+            health: root.health
+            host: root.host
+            foreground: root.contentForeground
+            fontFamily: root.contentFontFamily
+          }
+
+          ReportsView {
+            width: parent.width
+            visible: root.view === "reports"
+            health: root.health
+            host: root.host
+            foreground: root.contentForeground
+            fontFamily: root.contentFontFamily
+          }
+
+          Column {
+            width: parent.width
+            visible: root.view === "card"
+            spacing: Style.space(9)
+
+            CardView {
+              width: parent.width
+              card: root.health.emergency || ({})
+              host: root.host
+              foreground: root.contentForeground
+              fontFamily: root.contentFontFamily
+            }
+
+            ChipButton {
+              text: "Open fullscreen card"
+              tint: "#f59e0b"
+              filled: true
+              fontFamily: root.contentFontFamily
+              onClicked: if (root.host) root.host.showEmergency()
+            }
+          }
+
           // ---- Footer: the doors out of here. --------------------------
           PanelSeparator { foreground: root.contentForeground }
 
@@ -676,6 +797,14 @@ Panel {
                 fontFamily: root.contentFontFamily
                 onClicked: if (root.host) root.host.openDashboard()
               }
+
+              ChipButton {
+                text: "Emergency card"
+                tint: "#ef4444"
+                filled: true
+                fontFamily: root.contentFontFamily
+                onClicked: if (root.host) root.host.showEmergency()
+              }
             }
           }
         }
@@ -716,6 +845,8 @@ Panel {
   }
 
   function footerLine() {
+    if (root.host && String(root.host.actionMessage || "") !== "")
+      return String(root.host.actionMessage)
     var a7 = root.payload.adherence7
     var a30 = root.payload.adherence30
     var text = "7d " + (a7 === null || a7 === undefined ? "—" : a7 + "%")

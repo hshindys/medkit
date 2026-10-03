@@ -4,7 +4,18 @@ A small Omarchy shell bar widget for **MedKit**, the medication tracker: a
 colored status dot plus the next dose time, today's progress, and a low-stock
 warning.
 
-- **Left / right click** — open the MedKit dashboard; click again to close it.
+- **Left / right click** — open the MedKit panel; click again to close it.
+- The panel switches between five views: **doses**, **safety** (drug
+  interactions, food/meal timing, pregnancy, missed-dose protocol), **health**
+  (adherence, vitals correlation, side effects, refills), **reports** (therapy
+  review, weekly/monthly reports) and **card** (the emergency card).
+- **Keys** — `1`–`4` jump to a dose tab, `5`–`8` jump to a view (safety,
+  health, reports, card), `t` take the next dose, `r` refresh, `e` dashboard,
+  `a` add a medicine, `f` refill, `c` open the fullscreen emergency card
+  (`Esc`, `q` or `c` closes it again).
+- **Emergency card** — a fullscreen overlay (blood type, allergies,
+  conditions, contacts, medicines, emergency numbers) that works **fully
+  offline**; also exportable as text/PDF through the CLI.
 - **Edit** on a dose card (or a low-stock row) opens the dashboard straight on
   that medicine's edit form — time, dose, and course days when it is an
   emergency.
@@ -15,6 +26,18 @@ warning.
   (overdue or emergency supply low), gray (nothing due yet).
 - Refreshes every 30 seconds, and on bar IPC `refresh`.
 
+IPC (from `omarchy-shell -q ipc`):
+
+| Function | Effect |
+|---|---|
+| `medicalCard()` | open the emergency-card overlay |
+| `closeCard()` | close it |
+| `card()` | toggle it |
+
+Every answer on the safety/health views and on the card ends with
+*This is not medical advice.* The knowledge base is bundled and offline — no
+network call is made.
+
 The tracker itself lives in [`hshindys/medkit`](https://github.com/hshindys/medkit)
 (GTK3 tray + dashboard, reminders, emergency medicines, systemd units).
 
@@ -22,7 +45,9 @@ The tracker itself lives in [`hshindys/medkit`](https://github.com/hshindys/medk
 
 - [MedKit](https://github.com/hshindys/medkit) checked out at `~/medkit`
   (`bin/medkit` provides `--plugin-panel`, `--take`, `--skip`, `--refill`,
-  `--add-medicine`, `--edit`, `--delete`, `--notify-due` and `--dashboard-toggle`).
+  `--add-medicine`, `--edit`, `--delete`, `--notify-due`,
+  `--dashboard-toggle`, `--headless-test`, `--emergency-export`,
+  `--emergency-call`, `--review-export` and `--review-done`).
 - Omarchy shell (Quickshell bar).
 
 ```sh
@@ -74,8 +99,15 @@ the widget from the bar. It touches nothing else — MedKit itself, its data
 | File | Purpose |
 |---|---|
 | `manifest.json` | Omarchy plugin manifest (id `hshindys.medkit`) |
-| `MedKitBar.qml` | the bar widget: data, actions, panel host |
-| `Panel.qml` | the click-open dose panel (tabs, doses, low stock, footer) |
+| `MedKitBar.qml` | the bar widget: data, actions, IPC, panel + overlay host |
+| `Panel.qml` | the click-open panel (view switcher, doses, safety, health, reports, card) |
+| `views/Block.qml` | the card container every view section uses |
+| `views/ViewSwitcher.qml` | the segmented view switcher with badges |
+| `views/SafetyView.qml` | interactions, food, pregnancy, missed dose |
+| `views/HealthView.qml` | adherence, vitals correlation, side effects, refills |
+| `views/ReportsView.qml` | therapy review, weekly / monthly reports |
+| `views/CardView.qml` | the emergency card (also rendered fullscreen) |
+| `EmergencyOverlay.qml` | the fullscreen, offline emergency card |
 | `DoseCard.qml` | one dose: Take · Skip · Edit |
 | `ChipButton.qml` | the tinted pill button every action uses |
 | `PillIcon.qml` | the medicine's own pill glyph |

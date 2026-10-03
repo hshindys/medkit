@@ -27,8 +27,20 @@ needed — `/usr/lib/libayatana-appindicator3.so.1` is present on this machine.
 ~/medkit/bin/medkit --delete "Evening pill"  # dashboard asks before dropping it
 ~/medkit/bin/medkit --test-notify       # fire one real notification
 ~/medkit/bin/medkit --headless-test     # logic self test (sandboxed)
+~/medkit/bin/medkit --interactions      # drug-drug interaction report
+~/medkit/bin/medkit --food              # food / meal-timing rules
+~/medkit/bin/medkit --pregnancy         # pregnancy & breastfeeding warnings
+~/medkit/bin/medkit --missed            # missed-dose protocol
+~/medkit/bin/medkit --refill-status     # days of supply left per medicine
+~/medkit/bin/medkit --adherence         # daily + weekly adherence
+~/medkit/bin/medkit --report weekly     # 7-day report (also: monthly)
+~/medkit/bin/medkit --review            # therapy review status
+~/medkit/bin/medkit --emergency-card    # the card, printed
+~/medkit/bin/medkit --emergency-export pdf   # save it as a PDF
+~/medkit/bin/medkit --emergency-call ambulance
 ~/medkit/bin/medkit-sni                 # prove the tray icon is registered on the bus
 ```
+
 
 `python3 -m medkit` works too when run from `~/medkit/`.
 
@@ -157,6 +169,37 @@ Notification rules implemented by the tick:
 
 ---
 
+## Safety and health records
+
+Everything below runs from a **bundled offline knowledge snapshot**
+(`medkit/data/knowledge.json` — generic names, classes, food and pregnancy
+rules, missed-dose guidance; DrugBank / DailyMed / MedlinePlus / NHS BNF cited
+in `--profile-show` and on every card). No network call is made, and every
+answer ends with *This is not medical advice.*
+
+| Command | What it prints |
+|---|---|
+| `--interactions` | moderate/severe pairs among your active medicines, with effect + advice |
+| `--food` | what to take with food, and what to avoid (grapefruit, dairy, alcohol, …) |
+| `--pregnancy` | flags from your profile's pregnancy status, plus alternatives |
+| `--missed` | the protocol for every medicine — personal note wins over the generic rule |
+| `--refill-status` | days of supply left, warnings at `--days` (default 3) |
+| `--adherence` | today + last 7 days, doses taken / scheduled / missed |
+| `--report weekly` · `--report monthly` | per-medicine rates, refills, side effects, vitals, missed doses |
+| `--review` | months since the last therapy review, due?, duplicate classes |
+| `--review-export` · `--review-done` | export the review / record it as done |
+| `--emergency-card` · `--emergency-export txt\|pdf` | blood type, allergies, contacts, medicines |
+| `--emergency-call TARGET` · `--call-pharmacy` | `tel:` / `xdg-open` on the right number |
+| `--side-effect NAME EFFECT SEVERITY` · `--side-effect-list` | log a side effect, list repeats (3rd report alerts) |
+| `--vital kind value` · `--profile-show` · `--profile-set K V` | blood pressure / pulse / glucose readings, medical profile |
+| `--set-generic NAME GENERIC` | link a medicine to its generic ingredient (drives the checks) |
+
+`--tick` also plans health notices — interaction, food, adherence, refill,
+missed-dose, repeat side effect, review due, pregnancy — with the same
+de-duplication as dose reminders.
+
+---
+
 ## Keybindings
 
 Nothing under `~/.config/hypr/` was modified. If you want shortcuts, add these
@@ -172,11 +215,16 @@ o.bind("SUPER + SHIFT + N", "MedKit status", "alacritty -e ~/medkit/bin/medkit -
 ## Bar widget (Omarchy plugin)
 
 `plugin/` holds a Quickshell bar widget — status dot, next dose time, daily
-progress and low-stock warnings; click toggles a dose panel (doses, low stock,
-emergency) and each of its rows carries **Take** / **Skip** / **Edit** /
-**Delete**, where **Edit** opens the dashboard straight on that medicine's form
-(time, dose, and course days for emergencies) and **Delete** opens the
-dashboard on its delete confirmation. It is published as its own repository:
+progress and low-stock warnings; click toggles a panel with a segmented
+switcher: **doses** (Take / Skip / Edit / Delete rows), **safety**
+(interactions, food, pregnancy, missed dose), **health** (adherence, vitals
+correlation, side effects, refills) and **reports** (therapy review + weekly /
+monthly reports) — plus a **card** view with the emergency card, which also
+opens fullscreen on `c` (`SUPER+CTRL+11` opens the panel, `5`–`8` jump
+straight to a view). Each row's **Edit** opens the
+dashboard straight on that medicine's form (time, dose, and course days for
+emergencies) and **Delete** opens the dashboard on its delete confirmation. It
+is published as its own repository:
 
 ```bash
 omarchy plugin add https://github.com/hshindys/omarchy-medkit.git --enable
@@ -194,6 +242,11 @@ Validate a local copy with `omarchy plugin validate ./plugin`.
 | `~/.local/share/medkit/history.jsonl` | one JSON object per line: `{"ts","medicine","action"}` with `action` ∈ `taken` / `skipped` / `restock` |
 | `~/.local/share/medkit/state.json` | notification de-duplication keys |
 | `~/.local/share/medkit/emergency.log` | timestamped out-of-stock lines |
+| `~/.local/share/medkit/profile.json` | blood type, allergies, conditions, pregnancy status, contacts |
+| `~/.local/share/medkit/sideeffects.jsonl` | one JSON object per line: `{"ts","medicine","effect","severity"}` |
+| `~/.local/share/medkit/vitals.jsonl` | one JSON object per line: `{"ts","kind","value","value2","source"}` |
+| `~/.local/share/medkit/review.json` | last therapy review (date, exported flag) |
+| `~/.local/share/medkit/reports/` | exported weekly / monthly reports and wallet cards |
 | `~/.local/share/medkit/icons/` | generated colour + badge tray icons |
 | `~/.config/systemd/user/medkit-*` | the units |
 | `~/.config/medkit/config.json` | optional `{"vault_file": "/path/to/لوحة-الصحة.md"}` override |
@@ -226,6 +279,11 @@ systemctl --user list-timers | grep medkit
 │   ├── paths.py  models.py  store.py     data layer
 │   ├── engine.py                          schedule, colours, adherence, streaks
 │   ├── notify.py  tick.py                 notification planning + de-duplication
+│   ├── knowledge.py  interactions.py      offline drug snapshot + pair checks
+│   │   food.py  pregnancy.py  missed.py   meal timing, pregnancy, missed dose
+│   │   refill.py  adherence.py  vitals.py supply, adherence, readings
+│   │   sideeffects.py  review.py          side-effect log, therapy review
+│   │   emergency.py  reporting.py  pdf.py emergency card, reports, pure-python PDF
 │   ├── actions.py                         mark taken / skipped, CRUD, counts
 │   ├── vault.py                           21:30 health-vault summary
 │   ├── render.py                           cairo tray icons (colour + badge)

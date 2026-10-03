@@ -64,6 +64,37 @@ def icon_dir() -> Path:
     return data_dir() / "icons"
 
 
+# ---- health records (everything below stays on this machine) ------------
+def profile_file() -> Path:
+    """Blood type, allergies, chronic conditions, emergency contact, status."""
+    return data_dir() / "profile.json"
+
+
+def sideeffects_file() -> Path:
+    """Append-only log: one JSON object per reported side effect."""
+    return data_dir() / "sideeffects.jsonl"
+
+
+def vitals_file() -> Path:
+    """Append-only log: one JSON object per blood pressure / sugar reading."""
+    return data_dir() / "vitals.jsonl"
+
+
+def review_file() -> Path:
+    """When the last medication therapy review ran, and when the next is due."""
+    return data_dir() / "review.json"
+
+
+def reports_dir() -> Path:
+    """Generated reports: weekly/monthly summaries and the doctor PDF."""
+    return data_dir() / "reports"
+
+
+def knowledge_file() -> Path:
+    """The bundled offline knowledge base (drug, food and pregnancy data)."""
+    return PROJECT_DIR / "medkit" / "data" / "knowledge.json"
+
+
 def medkit_bin() -> Path:
     return PROJECT_DIR / "bin" / "medkit"
 

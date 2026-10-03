@@ -19,6 +19,13 @@ class Medicine:
     active: bool = True
     emergency_contacts: str = ""
     days: int = 0
+    # The international non-proprietary name ("bisoprolol" for "Concor").
+    # The safety checks match on this first, then fall back to the brand
+    # name, so a brand-only entry still finds its drug class.
+    generic: str = ""
+    # A personal missed-dose instruction. When empty the protocol is derived
+    # from the medicine's drug class (see missed.py).
+    missed_dose_note: str = ""
 
     @property
     def is_emergency(self) -> bool:
@@ -85,6 +92,8 @@ class Medicine:
             active=bool(raw.get("active", True)),
             emergency_contacts=str(raw.get("emergency_contacts", "")),
             days=int(days or 0),
+            generic=str(raw.get("generic", "")),
+            missed_dose_note=str(raw.get("missed_dose_note", "")),
         )
 
     def to_dict(self) -> dict:
@@ -99,6 +108,8 @@ class Medicine:
             "active": self.active,
             "emergency_contacts": self.emergency_contacts,
             "days": self.days,
+            "generic": self.generic,
+            "missed_dose_note": self.missed_dose_note,
         }
 
 

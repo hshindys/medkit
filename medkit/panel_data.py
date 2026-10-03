@@ -64,6 +64,103 @@ def _pill(name: str) -> dict:
     }
 
 
+def health_payload(
+    moment: datetime | None = None,
+    snapshot: tuple | None = None,
+) -> dict:
+    """The safety, health and report half of the panel.
+
+    Everything here is read from local files only — no network, so the panel
+    still fills in with the Wi-Fi off and, more importantly, so nothing about
+    your medicines leaves this machine.
+    """
+    from . import (
+        adherence,
+        emergency,
+        food,
+        interactions,
+        missed,
+        pregnancy,
+        refill,
+        reporting,
+        review,
+        sideeffects,
+        store,
+        vitals,
+    )
+    from .knowledge import load
+
+    moment = moment or datetime.now().astimezone()
+    document, status, history = snapshot or actions.snapshot(moment)
+    active = [medicine for medicine in document.medicines if medicine.active]
+    book = load()
+    profile = store.load_profile()
+
+    findings = interactions.check(active, book)
+    food_rows = food.check(active, book)
+    pregnancy_state = pregnancy.check(active, profile, book)
+    week = adherence.weekly(active, history, moment)
+    day = adherence.daily(active, history, moment)
+    streak = adherence.overall_streak(active, history, moment)
+    month = adherence.monthly(active, history, moment)
+    effects = sideeffects.since(30, moment)
+    repeats = sideeffects.repeat_alerts()
+    vitals_chart = vitals.chart(14, moment)
+    correlation = vitals.correlate(active, history, 30, moment)
+    vital_summary = vitals.summarize(7, moment)
+    missed_state = missed.summary(active, moment, history, book)
+    refills = refill.check(active, moment, profile)
+    review_state = {**review.status(moment), "duplicates": review.duplicates(active)}
+    card = emergency.card(active)
+    numbers = emergency.emergency_numbers()
+
+    return {
+        "disclaimer": book.disclaimer,
+        "sources": book.sources,
+        "updated": book.updated,
+        "interactions": {
+            "items": [finding.to_dict() for finding in findings],
+            "count": len(findings),
+            "nsaidBp": [
+                finding.to_dict() for finding in findings if finding.is_nsaid_bp
+            ],
+            "worst": interactions.summarize(findings)["worst"],
+        },
+        "food": {
+            "medicines": food_rows,
+            "alerts": food.alerts(active, book),
+        },
+        "pregnancy": pregnancy_state,
+        "adherence": {
+            "daily": day,
+            "weekly": week,
+            "monthly": month,
+            "streak": streak,
+            "threshold": adherence.ADHERENCE_THRESHOLD,
+        },
+        "sideEffects": {
+            "recent": effects[-20:],
+            "count": len(effects),
+            "repeats": repeats,
+            "week": sideeffects.weekly_summary(moment),
+        },
+        "vitals": {
+            "chart": vitals_chart,
+            "correlation": correlation,
+            "summary": vital_summary,
+        },
+        "missed": missed_state,
+        "refills": refills,
+        "review": review_state,
+        "reports": {
+            "weekly": reporting.weekly(active, history, moment),
+            "monthly": reporting.monthly(active, history, moment),
+        },
+        "emergency": {**card, "numbers": numbers},
+        "profile": profile,
+    }
+
+
 def payload(now: datetime | None = None) -> dict:
     moment = now or datetime.now().astimezone()
     document, status, history = actions.snapshot(moment)
@@ -155,6 +252,7 @@ def payload(now: datetime | None = None) -> dict:
         "tabs": tabs,
         "doses": doses,
         "medicines": medicines,
+        "health": health_payload(moment, (document, status, history)),
     }
 
 

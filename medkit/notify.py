@@ -29,7 +29,20 @@ class Notice:
     def validate(self) -> None:
         if self.urgency not in URGENCIES:
             raise ValueError(f"unsupported urgency: {self.urgency}")
-        if self.kind not in ("reminder", "overdue", "restock", "emergency"):
+        if self.kind not in (
+            "reminder",
+            "overdue",
+            "restock",
+            "emergency",
+            "interaction",
+            "food",
+            "adherence",
+            "refill",
+            "sideeffect",
+            "missed",
+            "review",
+            "pregnancy",
+        ):
             raise ValueError(f"unsupported kind: {self.kind}")
 
 
