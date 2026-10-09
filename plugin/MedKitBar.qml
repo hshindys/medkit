@@ -4,8 +4,8 @@ import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
-// MedKit in the bar: today's dose state as a coloured dot plus the next dose
-// and the taken/total count. Click opens the panel behind it — the same
+// MedKit in the bar: icon-only pill tinted with today's state. The time
+// appears only when a dose is due/overdue. Click opens the panel behind it — the same
 // gesture as every other panel widget — right-click still opens the GTK
 // dashboard for full management (add, edit, delete, wizard).
 //
@@ -64,12 +64,27 @@ BarWidget {
   // The bar's mark: a pill, tinted with today's state, instead of a bare dot.
   readonly property string pillGlyph: "󰐂"
 
+  // Bar display mode (option in settings):
+  // "due-only" = icon only, time appears only when due/overdue (default),
+  // "always" = next time or taken/total, always visible,
+  // "icon" = pill icon alone, never any text.
+  readonly property string barMode: {
+    var m = String(setting("barMode", "due-only") || "due-only")
+    return (m === "always" || m === "icon") ? m : "due-only"
+  }
+
   readonly property string labelText: {
     if (!wizardDone) return "setup"
-    if (nextDose !== "") return nextDose
-    if (totalCount > 0) return takenCount + "/" + totalCount
-    return "—"
+    if (root.barMode === "icon") return ""
+    if (root.barMode === "always") {
+      if (nextDose !== "") return nextDose
+      if (totalCount > 0) return takenCount + "/" + totalCount
+      return "—"
+    }
+    if ((medkitState === "amber" || medkitState === "red") && nextDose !== "") return nextDose
+    return ""
   }
+  readonly property bool showLabel: labelText !== ""
 
   visible: true
   implicitWidth: root.vertical
@@ -396,10 +411,10 @@ BarWidget {
       }
 
       Text {
-        visible: !root.vertical
+        visible: !root.vertical && root.showLabel
         textFormat: Text.PlainText
         text: root.labelText
-        color: root.bar ? root.bar.barForeground : Color.foreground
+        color: root.stateColorHex
         font.family: root.bar ? root.bar.fontFamily : Style.font.family
         font.pixelSize: Style.font.caption
       }
